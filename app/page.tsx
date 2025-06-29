@@ -33,15 +33,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Content Note for Developers */}
-      <div className="max-w-2xl mx-auto">
-        <div className="p-4 rounded-lg border border-blue-500/20 bg-blue-500/10">
-          <p className="text-sm text-blue-300">
-            <strong>Developer Note:</strong> To control content visibility,
-            add <code className="px-1 py-0.5 rounded bg-blue-500/20">visible: false</code> to the frontmatter of your MDX files.
-          </p>
-        </div>
-      </div>
+
 
       {/* Courses Section */}
       <div className="space-y-6">
