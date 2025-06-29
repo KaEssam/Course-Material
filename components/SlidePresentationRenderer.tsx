@@ -31,23 +31,23 @@ const slideComponents = {
     <h2 className="text-5xl font-semibold text-accent mb-6 text-center leading-tight" {...props} />
   ),
   h3: (props: any) => (
-    <h3 className="text-4xl font-medium mb-6 text-center" {...props} />
+    <h3 className="text-4xl font-medium mb-6 text-left" {...props} />
   ),
   h4: (props: any) => (
-    <h4 className="text-3xl font-medium mb-4 text-center" {...props} />
+    <h4 className="text-3xl font-medium mb-4 text-left" {...props} />
   ),
   p: ({ children, ...props }: any) => (
-    <p className="text-2xl leading-relaxed mb-6 text-center max-w-4xl mx-auto" {...props}>
+    <p className="text-2xl leading-relaxed mb-6 text-left max-w-5xl" {...props}>
       {children}
     </p>
   ),
   ul: ({ children, ...props }: any) => (
-    <ul className="text-xl space-y-4 mb-8 max-w-3xl mx-auto" {...props}>
+    <ul className="text-xl space-y-4 mb-8 max-w-4xl text-left" {...props}>
       {children}
     </ul>
   ),
   ol: ({ children, ...props }: any) => (
-    <ol className="text-xl space-y-4 mb-8 max-w-3xl mx-auto" {...props}>
+    <ol className="text-xl space-y-4 mb-8 max-w-4xl text-left" {...props}>
       {children}
     </ol>
   ),
@@ -58,7 +58,7 @@ const slideComponents = {
     </li>
   ),
   blockquote: ({ children, ...props }: any) => (
-    <blockquote className="border-l-8 border-accent bg-surface p-8 rounded-r-lg mb-8 italic text-2xl max-w-4xl mx-auto" {...props}>
+    <blockquote className="border-l-8 border-accent bg-surface p-8 rounded-r-lg mb-8 italic text-2xl max-w-4xl text-left" {...props}>
       {children}
     </blockquote>
   ),
@@ -92,13 +92,13 @@ const slideComponents = {
     const child = children?.props
     if (child?.className?.includes('language-mermaid')) {
       return (
-        <div className="my-8">
+        <div className="my-8 text-center">
           {mdxComponents.pre?.({ children, ...props })}
         </div>
       )
     }
     return (
-      <div className="my-8 text-left max-w-5xl mx-auto">
+      <div className="my-8 text-center max-w-5xl mx-auto">
         {mdxComponents.pre?.({ children, ...props })}
       </div>
     )
@@ -150,14 +150,14 @@ export default function SlidePresentationRenderer({
   const [error, setError] = useState<string | null>(null)
   const [zoomLevel, setZoomLevel] = useState(1)
 
-  // Split content into slides by ## headers
+  // Split content into slides by ## AND ### headers
   const parseSlides = useCallback(async (content: string) => {
     try {
       setIsLoading(true)
       setError(null)
 
-      // Split by ## but keep the ## headers
-      const sections = content.split(/(?=^## )/m).filter(section => section.trim())
+      // Split by ## or ### but keep the headers
+      const sections = content.split(/(?=^###? )/m).filter(section => section.trim())
 
       const parsedSlides: Slide[] = []
 
@@ -185,8 +185,10 @@ export default function SlidePresentationRenderer({
         let slideTitle = title
         let slideContent = section.trim()
 
-        // Extract title from ## header
-        if (firstLine.startsWith('## ')) {
+        // Extract title from ## or ### header
+        if (firstLine.startsWith('### ')) {
+          slideTitle = firstLine.replace('### ', '').trim()
+        } else if (firstLine.startsWith('## ')) {
           slideTitle = firstLine.replace('## ', '').trim()
         } else if (firstLine.startsWith('# ')) {
           slideTitle = firstLine.replace('# ', '').trim()
