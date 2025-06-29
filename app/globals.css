@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #100f0f;
+    color: #cecdc3;
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1c1b1a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #403e3c;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #878580;
+  }
+}
+
+@layer components {
+  /* Code block styles */
+  .code-block {
+    position: relative;
+    background: #1c1b1a;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  .code-header {
+    background: #403e3c;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .copy-button {
+    background: #d0a215;
+    color: #100f0f;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .copy-button:hover {
+    opacity: 0.8;
+  }
+
+  /* Mermaid diagram styles */
+  .mermaid {
+    background: #1c1b1a;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  /* Image zoom styles */
+  .medium-zoom-overlay {
+    background: rgba(16, 15, 15, 0.9) !important;
+  }
+
+  /* Dropdown styles */
+  .dropdown-content {
+    background: #1c1b1a;
+    border: 1px solid #403e3c;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}

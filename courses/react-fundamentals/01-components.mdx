@@ -1,0 +1,54 @@
+---
+title: "React Components: Building Blocks of UI"
+description: "Learn how to create and use React components to build user interfaces"
+---
+
+# React Components: Building Blocks of UI
+
+React is built around the concept of **components** - reusable pieces of UI that can be composed together to create complex user interfaces.
+
+## What is a Component?
+
+A component is a JavaScript function that returns JSX to describe what should appear on the screen.
+
+```jsx
+function Welcome() {
+  return <h1>Hello, World!</h1>;
+}
+```
+
+## Functional Components
+
+```jsx
+function Greeting() {
+  return (
+    <div>
+      <h1>Welcome to React!</h1>
+      <p>Let's build something awesome.</p>
+    </div>
+  );
+}
+```
+
+## Props: Passing Data
+
+Props allow you to pass data from parent to child components:
+
+```jsx
+function Greeting({ name }) {
+  return <h1>Hello, {name}!</h1>;
+}
+
+function App() {
+  return (
+    <div>
+      <Greeting name="Alice" />
+      <Greeting name="Bob" />
+    </div>
+  );
+}
+```
+
+## Summary
+
+React components enable building reusable, modular UIs through composition and props.
