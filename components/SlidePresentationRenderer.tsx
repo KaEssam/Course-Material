@@ -185,7 +185,7 @@ export default function SlidePresentationRenderer({
     }
   }, [title])
 
-  // Handle keyboard navigation
+    // Handle keyboard navigation
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.ctrlKey && (event.key === '=' || event.key === '-' || event.key === '0')) {
       event.preventDefault()
@@ -214,7 +214,7 @@ export default function SlidePresentationRenderer({
     }
   }, [slides.length])
 
-  // Handle mouse wheel zoom
+    // Handle mouse wheel zoom
   const handleWheel = useCallback((event: WheelEvent) => {
     if (event.ctrlKey) {
       event.preventDefault()
@@ -288,7 +288,7 @@ export default function SlidePresentationRenderer({
   const slide = slides[currentSlide]
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className="min-h-screen bg-background overflow-hidden relative">
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 z-10 bg-gradient-to-b from-background/90 to-transparent">
         <Link

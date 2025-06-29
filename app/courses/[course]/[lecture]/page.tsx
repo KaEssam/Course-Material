@@ -56,16 +56,6 @@ export default function LecturePage({ params }: LecturePageProps) {
             <Presentation size={16} />
             🎤 View as Presentation
           </Link>
-
-          {lectureData.hasAssignment && (
-            <Link
-              href={`/courses/${course}/${lecture}/assignment`}
-              className="flex items-center gap-2 bg-secondary text-background px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
-            >
-              <Clipboard size={16} />
-              View Assignment
-            </Link>
-          )}
         </div>
       </div>
 
@@ -73,6 +63,19 @@ export default function LecturePage({ params }: LecturePageProps) {
       <article className="prose prose-invert max-w-none">
         <MDXRenderer content={lectureData.content} />
       </article>
+
+      {/* Assignment Button - Below Article */}
+      {lectureData.hasAssignment && (
+        <div className="flex justify-center pt-8">
+          <Link
+            href={`/assignments/${course}/${lecture}`}
+            className="flex items-center gap-2 bg-secondary text-background px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-medium text-lg"
+          >
+            <Clipboard size={18} />
+            📎 View Assignment
+          </Link>
+        </div>
+      )}
 
       {/* Footer Navigation */}
       <div className="border-t border-border pt-6 mt-12">
@@ -86,7 +89,7 @@ export default function LecturePage({ params }: LecturePageProps) {
 
           {lectureData.hasAssignment && (
             <Link
-              href={`/courses/${course}/${lecture}/assignment`}
+              href={`/assignments/${course}/${lecture}`}
               className="text-secondary hover:text-accent transition-colors"
             >
               Assignment →
