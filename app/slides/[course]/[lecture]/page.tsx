@@ -1,5 +1,5 @@
 import SlidePresentationRenderer from '@/components/SlidePresentationRenderer'
-import { getLecture } from '@/lib/content'
+import { getAllCourses, getLecture } from '@/lib/content'
 import { notFound } from 'next/navigation'
 
 interface SlidePageProps {
@@ -25,6 +25,22 @@ export default function SlidePage({ params }: SlidePageProps) {
       lecture={lecture}
     />
   )
+}
+
+export async function generateStaticParams() {
+  const courses = getAllCourses()
+  const params: { course: string; lecture: string }[] = []
+
+  for (const course of courses) {
+    for (const lecture of course.lectures) {
+      params.push({
+        course: course.slug,
+        lecture: lecture.slug
+      })
+    }
+  }
+
+  return params
 }
 
 export async function generateMetadata({ params }: SlidePageProps) {

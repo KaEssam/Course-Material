@@ -47,7 +47,7 @@ export default function MermaidDiagram({ chart }: MermaidDiagramProps) {
 
             // Initialize medium-zoom for this specific diagram
             import('medium-zoom').then(({ default: mediumZoom }) => {
-              mediumZoom(svgElement, {
+              mediumZoom(svgElement as unknown as HTMLElement, {
                 background: 'rgba(16, 15, 15, 0.9)',
               })
             })

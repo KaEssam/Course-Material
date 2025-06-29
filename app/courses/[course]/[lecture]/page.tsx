@@ -1,5 +1,5 @@
 import MDXRenderer from '@/components/MDXRenderer'
-import { getLecture } from '@/lib/content'
+import { getAllCourses, getLecture } from '@/lib/content'
 import { ArrowLeft, Clipboard, Presentation } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -99,6 +99,22 @@ export default function LecturePage({ params }: LecturePageProps) {
       </div>
     </div>
   )
+}
+
+export async function generateStaticParams() {
+  const courses = getAllCourses()
+  const params: { course: string; lecture: string }[] = []
+
+  for (const course of courses) {
+    for (const lecture of course.lectures) {
+      params.push({
+        course: course.slug,
+        lecture: lecture.slug
+      })
+    }
+  }
+
+  return params
 }
 
 export async function generateMetadata({ params }: LecturePageProps) {
