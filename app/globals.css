@@ -10,17 +10,18 @@
   }
 
   body {
-    background-color: #0a0a0a;
-    color: #e5e5e5;
+    background-color: #0f0f0f; /* Ultra Dark */
+    color: #d6d3cd; /* Soft White - main text */
     font-family: 'Inter', system-ui, sans-serif;
+    font-size: 17px;
     line-height: 1.7;
     font-weight: 400;
   }
 
   /* Selection */
   ::selection {
-    background: #333333;
-    color: #ffffff;
+    background: #d56a33; /* Warm Orange accent */
+    color: #0f0f0f;
   }
 
   /* Custom scrollbar */
@@ -29,39 +30,80 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #0a0a0a;
+    background: #0f0f0f; /* Ultra Dark */
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #333333;
+    background: #3d3d3d; /* Neutral Gray */
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #444444;
+    background: #d56a33; /* Warm Orange on hover */
   }
 
   /* Headings */
-  h1,
-  h2,
-  h3,
+  h1 {
+    color: #edeae3; /* Light Sand */
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  h2 {
+    color: #edeae3; /* Light Sand */
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+  }
+
+  h3 {
+    color: #edeae3; /* Light Sand */
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.4;
+    letter-spacing: -0.025em;
+  }
+
   h4,
   h5,
   h6 {
-    color: #ffffff;
+    color: #edeae3; /* Light Sand */
     font-weight: 600;
     letter-spacing: -0.025em;
   }
 
+  /* Paragraphs */
+  p {
+    line-height: 1.7; /* leading-relaxed */
+  }
+
   /* Links */
   a {
-    color: #e5e5e5;
+    color: #d6d3cd; /* Soft White */
     text-decoration: none;
     transition: color 0.2s ease;
   }
 
   a:hover {
-    color: #ffffff;
+    color: #e8904c; /* Pale Orange hover */
+  }
+
+  /* Code elements */
+  code {
+    font-family: 'JetBrains Mono', Monaco, Consolas, monospace;
+    font-size: 0.875rem; /* text-sm */
+    background: #1a1a1a; /* Deep Gray */
+    color: #e8e6e3; /* Soft White code text */
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
   }
 }
 
@@ -69,28 +111,28 @@
   /* Code block styles */
   .code-block {
     position: relative;
-    background: #111111;
-    border: 1px solid #1e1e1e;
+    background: #1a1a1a; /* Deep Gray */
+    border: 1px solid #3d3d3d; /* Neutral Gray border */
     border-radius: 8px;
     overflow: hidden;
     margin: 1.5rem 0;
   }
 
   .code-header {
-    background: #1a1a1a;
-    border-bottom: 1px solid #1e1e1e;
+    background: #0f0f0f; /* Ultra Dark */
+    border-bottom: 1px solid #3d3d3d; /* Neutral Gray */
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
-    color: #888888;
+    color: #8c8c8c; /* Muted text */
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
   .copy-button {
-    background: #333333;
-    color: #e5e5e5;
-    border: 1px solid #444444;
+    background: #3d3d3d; /* Neutral Gray */
+    color: #d6d3cd; /* Soft White */
+    border: 1px solid #d56a33; /* Warm Orange border */
     border-radius: 6px;
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
@@ -100,14 +142,15 @@
   }
 
   .copy-button:hover {
-    background: #444444;
-    border-color: #555555;
+    background: #d56a33; /* Warm Orange */
+    border-color: #e8904c; /* Pale Orange */
+    color: #0f0f0f; /* Dark text on orange */
   }
 
   /* Mermaid diagram styles */
   .mermaid {
-    background: #111111;
-    border: 1px solid #1e1e1e;
+    background: #1a1a1a; /* Deep Gray */
+    border: 1px solid #3d3d3d; /* Neutral Gray */
     border-radius: 8px;
     padding: 1.5rem;
     margin: 1.5rem 0;
@@ -115,13 +158,13 @@
 
   /* Image zoom styles */
   .medium-zoom-overlay {
-    background: rgba(10, 10, 10, 0.95) !important;
+    background: rgba(15, 15, 15, 0.95) !important; /* Ultra Dark with opacity */
   }
 
   /* Dropdown styles */
   .dropdown-content {
-    background: #111111;
-    border: 1px solid #1e1e1e;
+    background: #1a1a1a; /* Deep Gray */
+    border: 1px solid #3d3d3d; /* Neutral Gray */
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
@@ -133,30 +176,68 @@
 
   .hover-lift:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(213, 106, 51, 0.2); /* Warm Orange glow */
   }
 
   /* Card styles */
   .card {
-    background: #111111;
-    border: 1px solid #1e1e1e;
+    background: #1a1a1a; /* Deep Gray */
+    border: 1px solid #3d3d3d; /* Neutral Gray */
     border-radius: 12px;
     transition: all 0.2s ease;
   }
 
   .card:hover {
-    border-color: #333333;
-    background: #1a1a1a;
+    border-color: #d56a33; /* Warm Orange */
+    background: #0f0f0f; /* Ultra Dark */
+    box-shadow: 0 4px 16px rgba(213, 106, 51, 0.1); /* Subtle orange glow */
   }
 
   /* Focus styles */
   *:focus {
-    outline: 2px solid #4a9eff;
+    outline: 2px solid #d56a33; /* Warm Orange focus */
     outline-offset: 2px;
   }
 
   /* Typography improvements */
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Utility classes for the new color system */
+  .text-muted {
+    color: #8c8c8c; /* Gray for descriptions */
+  }
+
+  .text-accent-orange {
+    color: #d56a33; /* Warm Orange */
+  }
+
+  .text-accent-yellow {
+    color: #f1c076; /* Soft Yellow */
+  }
+
+  .text-accent-green {
+    color: #88a66f; /* Muted Green */
+  }
+
+  .bg-accent-orange {
+    background-color: #d56a33; /* Warm Orange */
+  }
+
+  .bg-accent-yellow {
+    background-color: #f1c076; /* Soft Yellow */
+  }
+
+  .bg-accent-green {
+    background-color: #88a66f; /* Muted Green */
+  }
+
+  .border-accent-orange {
+    border-color: #d56a33; /* Warm Orange */
+  }
+
+  .border-neutral {
+    border-color: #3d3d3d; /* Neutral Gray */
   }
 }
