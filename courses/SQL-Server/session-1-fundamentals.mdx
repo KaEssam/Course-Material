@@ -1,12 +1,10 @@
 ---
-title: 'Session 1 - Database Design Fundamentals'
+title: 'Session 1 - Database Design'
 description: 'Introduction to database systems, design lifecycle, and Entity-Relationship modeling concepts'
 tags: ['database', 'design', 'ER-modeling', 'fundamentals', 'DBMS']
 ---
 
-# Database Design Fundamentals
-
-## Table of Contents
+### Table of Contents
 
 1. [Types of Systems](#types-of-systems)
 2. [Database Fundamentals](#database-fundamentals)
@@ -17,7 +15,7 @@ tags: ['database', 'design', 'ER-modeling', 'fundamentals', 'DBMS']
 
 ---
 
-## Types of Systems
+### Types of Systems
 
 - **File-Based Systems**
 - **SQL Database Systems (Relational)**
@@ -25,7 +23,7 @@ tags: ['database', 'design', 'ER-modeling', 'fundamentals', 'DBMS']
 
 ---
 
-## Comparison Table
+### Comparison Table
 
 | Feature/Aspect           | **File-Based System**                             | **SQL DB System** (Relational)                      | **NoSQL DB System** (Non-Relational)                                             |
 | ------------------------ | ------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -50,7 +48,7 @@ tags: ['database', 'design', 'ER-modeling', 'fundamentals', 'DBMS']
 
 ---
 
-## Summary
+### Summary
 
 | System Type | Best For                               | Limitations                                      |
 | ----------- | -------------------------------------- | ------------------------------------------------ |
@@ -60,7 +58,7 @@ tags: ['database', 'design', 'ER-modeling', 'fundamentals', 'DBMS']
 
 ---
 
-## Notes
+### Notes
 
 - NoSQL is not a replacement for SQL — it's a different approach for different use cases.
 - SQL is still dominant in many enterprise environments due to its structure and maturity.
@@ -147,11 +145,11 @@ Entity-Relationship (ER) modeling is a conceptual design technique used to model
 - **Implementation Guide**: Provides blueprint for database creation
 - **Maintenance**: Facilitates future modifications and updates
 
-> 💡 **Tip**: ER diagrams are like architectural blueprints for databases - they show the structure before building begins.
+> **Tip**: ER diagrams are like architectural blueprints for databases - they show the structure before building begins.
 
-### Basic Components of ER Modeling
+## Components of ER Modeling
 
-#### 1. Entities
+### 1. Entities
 
 An entity is a real-world object or concept.
 
@@ -165,69 +163,67 @@ An entity is a real-world object or concept.
 
 ![Entity Types](/images/database-design/Entities.drawio.png)
 
-#### 2. Attributes
+### 2. Attributes
 
 Properties that describe entities.
 
-**Simple Attributes**: Cannot be divided further
+### **Simple Attributes**: Cannot be divided further
 
 - Name, Age, Email
 
 ![Simple Attributes](/images/database-design/Simple%20Attributes.drawio.png)
 
-**Composite Attributes**: Can be broken into smaller parts
+### **Composite Attributes**: Can be broken into smaller parts
 
 - Address (Street, City, State, ZIP)
 
 ![Composite Attributes](/images/database-design/composite%20attributes.drawio.png)
 
-**Derived Attributes**: Calculated from other attributes
+### **Derived Attributes**: Calculated from other attributes
 
 - Age (derived from birth_date)
 
 ![Derived Attributes](/images/database-design/Drived%20Attributes.drawio.png)
 
-**Multivalued Attributes**: Can have multiple values
+### **Multivalued Attributes**: Can have multiple values
 
 - Phone numbers
 
 ![Multivalued Attributes](/images/database-design/multivalued%20attributes.drawio.png)
 
-**Complex Attributes**: Composite + multivalued (have more address and address is composite)
+### **Complex Attributes**: Composite + multivalued (have more address and address is composite)
 
 ![Complex Attributes](/images/database-design/Complix%20Attributes.drawio.png)
 
-#### 3. Relationships
+### 3. Relationships
 
 Associations between two or more entities.
 
-#### Types (Degree) of Relationships:
-
-**1. Unary (Degree = 1)**: Between two instances of one entity type
+### **1. Unary (Degree = 1)**: Between two instances of one entity type
 
 ![Unary Relationship](/images/database-design/unary%20.drawio.png)
 
-**2. Binary (Degree = 2)**: Between two instances of two entity types
+### **2. Binary (Degree = 2)**: Between two instances of two entity types
 
 ![Binary Relationship](/images/database-design/binary%20.drawio.png)
 
-**3. Ternary (Degree = 3)**: Among the instances of three entity types
+### **3. Ternary (Degree = 3)**: Among the instances of three entity types
 
 ![Ternary Relationship](/images/database-design/Ternary%20.drawio.png)
 
-#### Cardinality of Relationships
+### Cardinality of Relationships
 
 How many instances of one entity will or must be connected to a single instance from the other entities.
 
-**One-to-One (1:1)**: Each entity instance relates to exactly one instance of another entity
+### **One-to-One (1:1)**: Each entity instance relates to exactly one instance of another entity
 
 ![One-to-One Relationship](</images/database-design/_One-to-One%20Relationship.drawio%20(1).png>)
 
-**One-to-Many (1:N)**: One entity instance relates to many instances of another entity
+### **One-to-Many (1:N)**: One entity instance relates to many instances of another entity
 
 ![One-to-Many Relationship](/images/database-design/One-to-Many%20Relationship.drawio.png)
 
-**Many-to-Many (M:N)**: Many instances of one entity relate to many instances of another entity
+### **Many-to-Many (M:N)**: Many instances of one entity relate to many instances of another entity
 
 ![Many-to-Many Relationship](</images/database-design/_Many-to-Many%20Relationship.drawio%20(1)%201.png>)
 
@@ -252,39 +248,37 @@ How many instances of one entity will or must be connected to a single instance 
 
 Keys are crucial for maintaining data integrity and establishing relationships between tables.
 
-### Types of Keys
-
-#### 1. Primary Key (PK)
+### 1. Primary Key (PK)
 
 Uniquely identifies each record in a table. Cannot be NULL and must be unique.
 
-#### 2. Foreign Key (FK)
+### 2. Foreign Key (FK)
 
 References the primary key of another table, establishing relationships.
 
-#### 3. Composite Key
+### 3. Composite Key
 
 Combination of two or more columns that uniquely identify a record.
 
-#### 4. Candidate Key
+### 4. Candidate Key
 
 Any column or combination of columns that can serve as a primary key.
 
-#### 5. Super Key
+### 5. Super Key
 
 A set of attributes that can uniquely identify a record (may include unnecessary attributes).
 
-#### 6. Alternate Key
+### 6. Alternate Key
 
 Candidate keys that are not chosen as the primary key.
 
-#### 7. Surrogate Key
+### 7. Surrogate Key
 
 An artificial key used when no natural primary key exists.
 
-![Database Keys Overview](/images/database-design/Screenshot_27-6-2025_7054_www.programiz.com.jpeg)
+## ![Database Keys Overview](/images/database-design/Screenshot_27-6-2025_7054_www.programiz.com.jpeg)
 
-![Key Types Examples](/images/database-design/Screenshot_27-6-2025_7122_www.programiz.com.jpeg)
+## ![Key Types Examples](/images/database-design/Screenshot_27-6-2025_7122_www.programiz.com.jpeg)
 
 ---
 
@@ -292,7 +286,7 @@ An artificial key used when no natural primary key exists.
 
 A big company has decided to store information about its projects and employees in a database.
 
-### Requirements:
+#### Requirements:
 
 - The company has a number of employees; each employee has SSN, Birth Date, Gender and Name which represented as Fname and Lname.
 - The company has a set of departments; each department has a set of attributes DName, DNUM (unique) and locations.
@@ -304,17 +298,6 @@ A big company has decided to store information about its projects and employees 
 - Employees work in several projects and each project has several employees and each employee has a number of working hours in each project.
 - Each employee has a supervisor.
 
-### Exercise
-
-Try to create an ER diagram for this company system based on the requirements above. Identify:
-
-1. **Entities** and their attributes
-2. **Relationships** and their cardinalities
-3. **Participation constraints**
-4. **Primary and foreign keys**
-
----
-
 ## Summary
 
 In this session, we covered:
@@ -325,16 +308,3 @@ In this session, we covered:
 - ✅ **ER Modeling**: Entities, attributes, relationships, and their types
 - ✅ **Database Keys**: Primary, foreign, composite, and other key types
 - ✅ **Practical Case Study**: Real-world example for hands-on practice
-
-### Next Steps
-
-In the next session, we'll cover:
-
-- Advanced ER modeling techniques
-- Normalization principles
-- Converting ER diagrams to relational schemas
-- Database optimization strategies
-
----
-
-_Happy Learning! 📚✨_
