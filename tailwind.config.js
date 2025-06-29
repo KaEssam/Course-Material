@@ -8,14 +8,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Flexoki Dark Theme
-        background: '#100F0F',
-        text: '#CECDC3',
-        muted: '#878580',
-        accent: '#D0A215',
-        secondary: '#4385BE',
-        surface: '#1C1B1A',
-        border: '#403E3C',
+        // Steph Ango inspired dark theme
+        background: '#0a0a0a',
+        text: '#e5e5e5',
+        muted: '#888888',
+        accent: '#666666',
+        secondary: '#4a9eff',
+        surface: '#111111',
+        border: '#1e1e1e',
+        'surface-hover': '#1a1a1a',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
