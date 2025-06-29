@@ -22,10 +22,10 @@ export default function LecturePage({ params }: LecturePageProps) {
   return (
     <div className="space-y-6">
       {/* Navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <Link
           href="/"
-          className="flex items-center gap-2 text-muted hover:text-text transition-colors"
+          className="flex gap-2 items-center transition-colors text-muted hover:text-text"
         >
           <ArrowLeft size={16} />
           Back to Courses
@@ -42,7 +42,7 @@ export default function LecturePage({ params }: LecturePageProps) {
         </h1>
 
         {lectureData.description && (
-          <p className="text-muted text-lg">
+          <p className="text-lg text-muted">
             {lectureData.description}
           </p>
         )}
@@ -51,16 +51,16 @@ export default function LecturePage({ params }: LecturePageProps) {
         <div className="flex flex-wrap gap-3">
           <Link
             href={`/slides/${course}/${lecture}`}
-            className="flex items-center gap-2 bg-accent text-background px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
+            className="flex items-center gap-1.5 bg-accent text-background px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity text-sm"
           >
-            <Presentation size={16} />
-            🎤 View as Presentation
+            <Presentation size={14} />
+            View as Presentation
           </Link>
         </div>
       </div>
 
       {/* Content */}
-      <article className="prose prose-invert max-w-none">
+      <article className="max-w-none prose prose-invert">
         <MDXRenderer content={lectureData.content} />
       </article>
 
@@ -69,20 +69,20 @@ export default function LecturePage({ params }: LecturePageProps) {
         <div className="flex justify-center pt-8">
           <Link
             href={`/assignments/${course}/${lecture}`}
-            className="flex items-center gap-2 bg-secondary text-background px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-medium text-lg"
+            className="flex items-center gap-1.5 bg-secondary text-background px-4 py-2 rounded-md hover:opacity-90 transition-opacity text-sm"
           >
-            <Clipboard size={18} />
-            📎 View Assignment
+            <Clipboard size={14} />
+             View Assignment
           </Link>
         </div>
       )}
 
       {/* Footer Navigation */}
-      <div className="border-t border-border pt-6 mt-12">
+      <div className="pt-6 mt-12 border-t border-border">
         <div className="flex justify-between items-center">
           <Link
             href="/"
-            className="text-muted hover:text-text transition-colors"
+            className="transition-colors text-muted hover:text-text"
           >
             ← All Courses
           </Link>
@@ -90,7 +90,7 @@ export default function LecturePage({ params }: LecturePageProps) {
           {lectureData.hasAssignment && (
             <Link
               href={`/assignments/${course}/${lecture}`}
-              className="text-secondary hover:text-accent transition-colors"
+              className="transition-colors text-secondary hover:text-accent"
             >
               Assignment →
             </Link>
