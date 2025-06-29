@@ -4,7 +4,8 @@ import { Check, Copy } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { oneDark, vsDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 // Dynamically import Mermaid to avoid SSR issues
 const MermaidDiagram = dynamic(() => import('./MermaidDiagram'), { ssr: false })
@@ -28,12 +29,12 @@ function CodeBlock({ children, className = '', filename }: CodeBlockProps) {
   return (
     <div className="code-block">
       <div className="code-header">
-        <span className="text-muted font-mono text-sm">
+        <span className="font-mono text-sm text-muted">
           {filename || language}
         </span>
         <button
           onClick={copyToClipboard}
-          className="copy-button flex items-center gap-1"
+          className="flex gap-1 items-center copy-button"
           title="Copy code"
         >
           {copied ? <Check size={12} /> : <Copy size={12} />}
@@ -42,7 +43,7 @@ function CodeBlock({ children, className = '', filename }: CodeBlockProps) {
       </div>
       <SyntaxHighlighter
         language={language}
-        style={oneDark}
+        style={vscDarkPlus}
         customStyle={{
           margin: 0,
           padding: '1rem',
@@ -78,9 +79,9 @@ function Heading({ level, children, ...props }: any) {
       className={classes[level as keyof typeof classes] || ''}
       {...props}
     >
-      <a href={`#${id}`} className="group relative">
+      <a href={`#${id}`} className="relative group">
         {children}
-        <span className="absolute -left-6 top-0 opacity-0 group-hover:opacity-50 text-muted">
+        <span className="absolute top-0 -left-6 opacity-0 group-hover:opacity-50 text-muted">
           #
         </span>
       </a>
@@ -102,7 +103,7 @@ function ZoomableImage({ src, alt, ...props }: any) {
     <img
       src={src}
       alt={alt}
-      className="rounded-lg mx-auto max-w-full h-auto cursor-zoom-in"
+      className="mx-auto max-w-full h-auto rounded-lg cursor-zoom-in"
       data-zoomable
       {...props}
     />
@@ -146,12 +147,12 @@ export const mdxComponents = {
     </p>
   ),
   ul: ({ children, ...props }: any) => (
-    <ul className="list-disc list-inside mb-4 space-y-1" {...props}>
+    <ul className="mb-4 space-y-1 list-disc list-inside" {...props}>
       {children}
     </ul>
   ),
   ol: ({ children, ...props }: any) => (
-    <ol className="list-decimal list-inside mb-4 space-y-1" {...props}>
+    <ol className="mb-4 space-y-1 list-decimal list-inside" {...props}>
       {children}
     </ol>
   ),
@@ -161,31 +162,31 @@ export const mdxComponents = {
     </li>
   ),
   blockquote: ({ children, ...props }: any) => (
-    <blockquote className="border-l-4 border-accent bg-surface p-4 rounded-r-lg mb-4 italic" {...props}>
+    <blockquote className="p-4 mb-4 italic rounded-r-lg border-l-4 border-accent bg-surface" {...props}>
       {children}
     </blockquote>
   ),
   table: ({ children, ...props }: any) => (
     <div className="overflow-x-auto mb-4">
-      <table className="w-full border-collapse bg-surface rounded-lg overflow-hidden" {...props}>
+      <table className="overflow-hidden w-full rounded-lg border-collapse bg-surface" {...props}>
         {children}
       </table>
     </div>
   ),
   th: ({ children, ...props }: any) => (
-    <th className="border-b border-border p-3 text-left font-medium bg-background" {...props}>
+    <th className="p-3 font-medium text-left border-b border-border bg-background" {...props}>
       {children}
     </th>
   ),
   td: ({ children, ...props }: any) => (
-    <td className="border-b border-border p-3" {...props}>
+    <td className="p-3 border-b border-border" {...props}>
       {children}
     </td>
   ),
   a: ({ children, href, ...props }: any) => (
     <a
       href={href}
-      className="text-secondary hover:text-accent underline transition-colors"
+      className="underline transition-colors text-secondary hover:text-accent"
       {...props}
     >
       {children}
