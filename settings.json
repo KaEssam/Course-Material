@@ -1,0 +1,43 @@
+{
+  "courses": {
+    "javascript-basics": {
+      "visible": true,
+      "lectures": {
+        "01-variables": {
+          "visible": false,
+          "assignmentVisible": true
+        },
+        "02-functions": {
+          "visible": true,
+          "assignmentVisible": true
+        },
+        "table-test": {
+          "visible": true,
+          "assignmentVisible": true
+        }
+      }
+    },
+    "react-fundamentals": {
+      "visible": true,
+      "lectures": {
+        "01-components": {
+          "visible": true,
+          "assignmentVisible": true
+        }
+      }
+    },
+    "SQL-Server": {
+      "visible": true,
+      "lectures": {
+        "database-design": {
+          "visible": true,
+          "assignmentVisible": true
+        },
+        "select": {
+          "visible": true,
+          "assignmentVisible": true
+        }
+      }
+    }
+  }
+}

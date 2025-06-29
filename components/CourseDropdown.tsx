@@ -1,7 +1,7 @@
 'use client'
 
 import { Course } from '@/lib/content'
-import { ChevronDown, ChevronRight, Clipboard, FileText } from 'lucide-react'
+import { ChevronDown, Clipboard, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -57,7 +57,7 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
                       )}
                     </Link>
 
-                    {lecture.hasAssignment && (
+                    {lecture.hasAssignment && lecture.assignmentVisible !== false && (
                       <Link
                         href={`/courses/${course.slug}/${lecture.slug}/assignment`}
                         className="ml-4 px-3 py-2 rounded-md text-muted hover:text-secondary hover:bg-surface-hover transition-all duration-200 flex items-center gap-2"

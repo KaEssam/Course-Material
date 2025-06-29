@@ -2,7 +2,8 @@ import CourseDropdown from '@/components/CourseDropdown'
 import { getAllCourses } from '@/lib/content'
 
 export default function HomePage() {
-  const courses = getAllCourses()
+  // Get courses based on visibility settings in MDX frontmatter
+  const courses = getAllCourses(true) // true = respect visibility from MDX files
 
   return (
     <div className="space-y-16">
@@ -28,20 +29,28 @@ export default function HomePage() {
         <div className="mx-auto max-w-2xl">
           <p className="text-lg leading-relaxed text-muted text-balance">
             Welcome to my teaching platform. you'll find course materials
-
           </p>
         </div>
       </div>
 
+      {/* Content Note for Developers */}
+      <div className="max-w-2xl mx-auto">
+        <div className="p-4 rounded-lg border border-blue-500/20 bg-blue-500/10">
+          <p className="text-sm text-blue-300">
+            <strong>Developer Note:</strong> To control content visibility,
+            add <code className="px-1 py-0.5 rounded bg-blue-500/20">visible: false</code> to the frontmatter of your MDX files.
+          </p>
+        </div>
+      </div>
 
       {/* Courses Section */}
       <div className="space-y-6">
         {courses.length === 0 ? (
           <div className="py-16 text-center">
             <div className="p-10 mx-auto max-w-lg card">
-              <h3 className="mb-6 text-2xl font-semibold text-white">Courses Coming Soon</h3>
+              <h3 className="mb-6 text-2xl font-semibold text-white">No Visible Content</h3>
               <p className="mb-8 leading-relaxed text-muted">
-                I'm currently preparing exciting new courses for you. Check back soon!
+                All courses are currently hidden. Remove <code className="px-1 py-0.5 rounded bg-surface-hover">visible: false</code> from your MDX frontmatter to make them visible.
               </p>
               <div className="p-6 font-mono text-sm text-left rounded-lg border bg-background border-border text-muted">
                 <div>📁 courses/</div>

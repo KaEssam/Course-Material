@@ -1,6 +1,7 @@
 ---
-title: "JavaScript Functions"
-description: "Master function declarations, expressions, arrow functions, and scope in JavaScript"
+title: 'Lecture 1: JavaScript Functions'
+description: 'Master function declarations, expressions, arrow functions, and scope in JavaScript'
+visible: true
 ---
 
 # JavaScript Functions
@@ -14,7 +15,7 @@ A function is a block of code designed to perform a particular task. It's like a
 ```javascript
 // A simple function
 function greet() {
-  console.log("Hello, World!");
+  console.log('Hello, World!');
 }
 
 // Call the function
@@ -33,13 +34,14 @@ function functionName(parameters) {
 ```
 
 ### Example: Basic Function
+
 ```javascript
 function sayHello(name) {
   return `Hello, ${name}!`;
 }
 
 // Using the function
-let message = sayHello("Alice");
+let message = sayHello('Alice');
 console.log(message); // Output: "Hello, Alice!"
 ```
 
@@ -49,12 +51,12 @@ You can also create functions using **function expressions**:
 
 ```javascript
 // Function expression
-const greet = function(name) {
+const greet = function (name) {
   return `Hi, ${name}!`;
 };
 
 // Anonymous function assigned to a variable
-const add = function(a, b) {
+const add = function (a, b) {
   return a + b;
 };
 
@@ -80,7 +82,7 @@ const multiply = (a, b) => {
 const multiply = (a, b) => a * b;
 
 // Single parameter (parentheses optional)
-const square = x => x * x;
+const square = (x) => x * x;
 
 // No parameters
 const getRandom = () => Math.random();
@@ -105,7 +107,8 @@ flowchart TD
 **Parameters** are variables listed in the function definition. **Arguments** are the actual values passed to the function.
 
 ```javascript
-function calculateArea(width, height) { // Parameters
+function calculateArea(width, height) {
+  // Parameters
   return width * height;
 }
 
@@ -114,17 +117,19 @@ console.log(area); // Output: 50
 ```
 
 ### Default Parameters
+
 ```javascript
-function greet(name = "Guest", time = "day") {
+function greet(name = 'Guest', time = 'day') {
   return `Good ${time}, ${name}!`;
 }
 
 console.log(greet()); // "Good day, Guest!"
-console.log(greet("Alice")); // "Good day, Alice!"
-console.log(greet("Bob", "morning")); // "Good morning, Bob!"
+console.log(greet('Alice')); // "Good day, Alice!"
+console.log(greet('Bob', 'morning')); // "Good morning, Bob!"
 ```
 
 ### Rest Parameters
+
 ```javascript
 function sum(...numbers) {
   return numbers.reduce((total, num) => total + num, 0);
@@ -144,7 +149,7 @@ function calculateTax(price, taxRate = 0.08) {
   return {
     price: price,
     tax: tax,
-    total: price + tax
+    total: price + tax,
   };
 }
 
@@ -164,7 +169,7 @@ function demonstrateScope() {
   let localVar = "I'm local";
 
   console.log(globalVar); // Accessible
-  console.log(localVar);  // Accessible
+  console.log(localVar); // Accessible
 }
 
 demonstrateScope();
@@ -172,14 +177,15 @@ demonstrateScope();
 ```
 
 ### Scope Chain Example
+
 ```javascript
-let level1 = "Global";
+let level1 = 'Global';
 
 function outerFunction() {
-  let level2 = "Outer";
+  let level2 = 'Outer';
 
   function innerFunction() {
-    let level3 = "Inner";
+    let level3 = 'Inner';
 
     console.log(level1); // "Global"
     console.log(level2); // "Outer"
@@ -203,12 +209,12 @@ function processNumbers(numbers, operation) {
 }
 
 const numbers = [1, 2, 3, 4, 5];
-const squared = processNumbers(numbers, x => x * x);
+const squared = processNumbers(numbers, (x) => x * x);
 console.log(squared); // [1, 4, 9, 16, 25]
 
 // Function that returns another function
 function createMultiplier(factor) {
-  return function(number) {
+  return function (number) {
     return number * factor;
   };
 }
@@ -223,54 +229,62 @@ console.log(triple(5)); // 15
 ## Common Function Patterns
 
 ### Immediately Invoked Function Expression (IIFE)
+
 ```javascript
-(function() {
-  console.log("This runs immediately!");
+(function () {
+  console.log('This runs immediately!');
 })();
 
 // Arrow function IIFE
 (() => {
-  console.log("Arrow IIFE!");
+  console.log('Arrow IIFE!');
 })();
 ```
 
 ### Callback Functions
+
 ```javascript
 function fetchData(callback) {
   // Simulate async operation
   setTimeout(() => {
-    const data = { id: 1, name: "Alice" };
+    const data = { id: 1, name: 'Alice' };
     callback(data);
   }, 1000);
 }
 
-fetchData(function(data) {
-  console.log("Received:", data);
+fetchData(function (data) {
+  console.log('Received:', data);
 });
 ```
 
 ## Function Comparison Table
 
-| Feature | Function Declaration | Function Expression | Arrow Function |
-|---------|---------------------|-------------------|----------------|
-| Hoisting | ✅ Yes | ❌ No | ❌ No |
-| `this` binding | Dynamic | Dynamic | Lexical |
-| Constructor | ✅ Yes | ✅ Yes | ❌ No |
-| Arguments object | ✅ Yes | ✅ Yes | ❌ No |
-| Syntax | Verbose | Medium | Concise |
+| Feature          | Function Declaration | Function Expression | Arrow Function |
+| ---------------- | -------------------- | ------------------- | -------------- |
+| Hoisting         | ✅ Yes               | ❌ No               | ❌ No          |
+| `this` binding   | Dynamic              | Dynamic             | Lexical        |
+| Constructor      | ✅ Yes               | ✅ Yes              | ❌ No          |
+| Arguments object | ✅ Yes               | ✅ Yes              | ❌ No          |
+| Syntax           | Verbose              | Medium              | Concise        |
 
 ## Best Practices
 
 1. **Use descriptive names**
+
    ```javascript
    // Bad
-   function calc(x, y) { return x * y; }
+   function calc(x, y) {
+     return x * y;
+   }
 
    // Good
-   function calculateArea(width, height) { return width * height; }
+   function calculateArea(width, height) {
+     return width * height;
+   }
    ```
 
 2. **Keep functions small and focused**
+
    ```javascript
    // Good - Single responsibility
    function validateEmail(email) {
@@ -283,18 +297,19 @@ fetchData(function(data) {
    ```
 
 3. **Use arrow functions for short operations**
+
    ```javascript
    // Good use of arrow functions
    const numbers = [1, 2, 3, 4, 5];
-   const doubled = numbers.map(n => n * 2);
-   const evens = numbers.filter(n => n % 2 === 0);
+   const doubled = numbers.map((n) => n * 2);
+   const evens = numbers.filter((n) => n % 2 === 0);
    ```
 
 4. **Handle edge cases**
    ```javascript
    function divide(a, b) {
      if (b === 0) {
-       throw new Error("Cannot divide by zero");
+       throw new Error('Cannot divide by zero');
      }
      return a / b;
    }
@@ -309,30 +324,32 @@ const calculator = {
   add: (a, b) => a + b,
   subtract: (a, b) => a - b,
   multiply: (a, b) => a * b,
-  divide: (a, b) => b !== 0 ? a / b : "Cannot divide by zero",
+  divide: (a, b) => (b !== 0 ? a / b : 'Cannot divide by zero'),
 
   calculate(operation, a, b) {
     if (typeof this[operation] === 'function') {
       return this[operation](a, b);
     }
-    return "Unknown operation";
-  }
+    return 'Unknown operation';
+  },
 };
 
-console.log(calculator.calculate('add', 10, 5));      // 15
-console.log(calculator.calculate('multiply', 4, 3));  // 12
-console.log(calculator.calculate('divide', 10, 0));   // "Cannot divide by zero"
+console.log(calculator.calculate('add', 10, 5)); // 15
+console.log(calculator.calculate('multiply', 4, 3)); // 12
+console.log(calculator.calculate('divide', 10, 0)); // "Cannot divide by zero"
 ```
 
 ## Summary
 
 Functions are essential for:
+
 - **Code reusability**: Write once, use many times
 - **Organization**: Break complex problems into smaller pieces
 - **Abstraction**: Hide implementation details
 - **Modularity**: Create independent, testable units
 
 ### Key Takeaways:
+
 - Functions can be declared, expressed, or written as arrows
 - Parameters make functions flexible and reusable
 - Scope determines variable accessibility
