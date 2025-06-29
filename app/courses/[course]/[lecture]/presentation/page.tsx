@@ -22,20 +22,20 @@ export default function PresentationPage({ params }: PresentationPageProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
+      <div className="flex justify-between items-center p-4 border-b border-border">
         <Link
           href={`/courses/${course}/${lecture}`}
-          className="flex items-center gap-2 text-muted hover:text-text transition-colors"
+          className="flex gap-2 items-center transition-colors text-muted hover:text-text"
         >
           <ArrowLeft size={16} />
           Exit Presentation
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="flex gap-4 items-center">
           <div className="text-sm text-muted">
             {course.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </div>
-          <div className="flex items-center gap-2 text-accent">
+          <div className="flex gap-2 items-center text-accent">
             <Maximize2 size={16} />
             <span className="font-medium">Presentation Mode</span>
           </div>
@@ -44,8 +44,8 @@ export default function PresentationPage({ params }: PresentationPageProps) {
 
       {/* Presentation Content */}
       <div className="p-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-accent mb-8 text-center">
+        <div className="mx-auto max-w-4xl">
+          <h1 className="mb-8 text-4xl font-bold text-center text-accent">
             {lectureData.title}
           </h1>
 

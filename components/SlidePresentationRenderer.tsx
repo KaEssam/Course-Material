@@ -367,39 +367,29 @@ export default function SlidePresentationRenderer({
         </div>
       </div>
 
-      {/* Navigation Controls - No slide numbers */}
-      <div className="flex-shrink-0 flex items-center justify-center gap-4 p-6">
+      {/* Fixed Navigation Controls - Bottom right */}
+      <div className="fixed right-6 bottom-6 flex items-center gap-3">
         <button
           onClick={prevSlide}
           disabled={currentSlide === 0}
-          className="p-3 bg-surface border border-border rounded-lg hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-2 text-muted hover:text-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           title="Previous slide (← or ↑)"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={24} />
         </button>
+
+        <div className="text-sm text-muted font-medium">
+          {currentSlide + 1} / {slides.length}
+        </div>
 
         <button
           onClick={nextSlide}
           disabled={currentSlide === slides.length - 1}
-          className="p-3 bg-surface border border-border rounded-lg hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-2 text-muted hover:text-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           title="Next slide (→ or ↓)"
         >
-          <ArrowRight size={20} />
+          <ArrowRight size={24} />
         </button>
-      </div>
-
-      {/* Zoom Indicator */}
-      {zoomLevel !== 1 && (
-        <div className="absolute top-20 right-6 bg-surface border border-border rounded-lg px-3 py-2 text-sm text-muted">
-          Zoom: {Math.round(zoomLevel * 100)}%
-        </div>
-      )}
-
-      {/* Keyboard Help */}
-      <div className="absolute bottom-20 right-6 text-xs text-muted max-w-48">
-        <div>← → Navigate slides</div>
-        <div>Ctrl + scroll: Zoom</div>
-        <div>Home/End: First/Last slide</div>
       </div>
     </div>
   )
