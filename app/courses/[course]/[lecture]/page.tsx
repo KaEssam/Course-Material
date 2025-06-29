@@ -50,7 +50,7 @@ export default function LecturePage({ params }: LecturePageProps) {
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
           <Link
-            href={`/courses/${course}/${lecture}/presentation`}
+            href={`/slides/${course}/${lecture}`}
             className="flex items-center gap-2 bg-accent text-background px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
           >
             <Presentation size={16} />
