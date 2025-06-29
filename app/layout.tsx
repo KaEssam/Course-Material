@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Technical Teaching Platform',
-  description: 'A minimalist platform for technical education with Markdown lectures',
+  title: 'Karim Essam - Software Engineering Instructor | DEPI & ITI',
+  description: 'Comprehensive software development courses by Karim Essam. Interactive lessons, presentations, and assignments for DEPI and ITI students.',
 }
 
 export default function RootLayout({

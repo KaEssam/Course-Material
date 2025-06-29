@@ -1,10 +1,11 @@
 'use client'
 
-import { ArrowLeft, ArrowRight, ChevronLeft } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronLeft, Home } from 'lucide-react'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+import remarkGfm from 'remark-gfm'
 import { mdxComponents } from './MDXComponents'
 
 interface SlidePresentationRendererProps {
@@ -102,6 +103,39 @@ const slideComponents = {
       </div>
     )
   },
+  // Enhanced table components for slides
+  table: ({ children, ...props }: any) => (
+    <div className="overflow-x-auto mb-8 max-w-5xl mx-auto">
+      <table className="w-full border-collapse bg-surface rounded-lg overflow-hidden text-lg" {...props}>
+        {children}
+      </table>
+    </div>
+  ),
+  thead: ({ children, ...props }: any) => (
+    <thead {...props}>
+      {children}
+    </thead>
+  ),
+  tbody: ({ children, ...props }: any) => (
+    <tbody {...props}>
+      {children}
+    </tbody>
+  ),
+  tr: ({ children, ...props }: any) => (
+    <tr {...props}>
+      {children}
+    </tr>
+  ),
+  th: ({ children, ...props }: any) => (
+    <th className="border-b-2 border-accent p-4 text-left font-semibold bg-background text-xl text-accent" {...props}>
+      {children}
+    </th>
+  ),
+  td: ({ children, ...props }: any) => (
+    <td className="border-b border-border p-4 text-lg" {...props}>
+      {children}
+    </td>
+  ),
 }
 
 export default function SlidePresentationRenderer({
@@ -136,7 +170,7 @@ export default function SlidePresentationRenderer({
       titleSlide.mdxSource = await serialize(titleSlide.content, {
         parseFrontmatter: false,
         mdxOptions: {
-          remarkPlugins: [],
+          remarkPlugins: [remarkGfm],
           rehypePlugins: [],
           development: process.env.NODE_ENV === 'development',
         },
@@ -167,7 +201,7 @@ export default function SlidePresentationRenderer({
         slide.mdxSource = await serialize(slideContent, {
           parseFrontmatter: false,
           mdxOptions: {
-            remarkPlugins: [],
+            remarkPlugins: [remarkGfm],
             rehypePlugins: [],
             development: process.env.NODE_ENV === 'development',
           },
@@ -288,31 +322,43 @@ export default function SlidePresentationRenderer({
   const slide = slides[currentSlide]
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden relative">
-      {/* Header */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 z-10 bg-gradient-to-b from-background/90 to-transparent">
-        <Link
-          href={`/courses/${course}/${lecture}`}
-          className="flex items-center gap-2 text-muted hover:text-text transition-colors text-lg"
-        >
-          <ChevronLeft size={20} />
-          Back to Lecture
-        </Link>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Fixed Navbar - No overlay, proper spacing */}
+      <nav className="flex-shrink-0 bg-background border-b border-border">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-muted hover:text-text transition-colors"
+            >
+              <Home size={16} />
+              All Courses
+            </Link>
+            <span className="text-border">|</span>
+            <Link
+              href={`/courses/${course}/${lecture}`}
+              className="flex items-center gap-2 text-muted hover:text-text transition-colors"
+            >
+              <ChevronLeft size={16} />
+              Back to Lecture
+            </Link>
+          </div>
 
-        <div className="text-right">
-          <div className="text-accent font-medium text-lg">{title}</div>
-          <div className="text-muted text-sm">
-            {currentSlide + 1} / {slides.length}
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-muted">
+              {course.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            </div>
+            <div className="text-accent font-medium">{title}</div>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Main Slide Content */}
-      <div
-        className="min-h-screen flex items-center justify-center p-8 transition-transform duration-300 ease-in-out"
-        style={{ transform: `scale(${zoomLevel})` }}
-      >
-        <div className="w-full max-w-6xl mx-auto">
+      {/* Main Slide Content - Takes remaining space */}
+      <div className="flex-1 flex items-center justify-center p-8 overflow-hidden">
+        <div
+          className="w-full max-w-6xl mx-auto transition-transform duration-300 ease-in-out"
+          style={{ transform: `scale(${zoomLevel})` }}
+        >
           {slide.mdxSource && (
             <div className="prose prose-invert max-w-none">
               <MDXRemote {...slide.mdxSource} components={slideComponents} />
@@ -321,8 +367,8 @@ export default function SlidePresentationRenderer({
         </div>
       </div>
 
-      {/* Navigation Controls */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4">
+      {/* Navigation Controls - No slide numbers */}
+      <div className="flex-shrink-0 flex items-center justify-center gap-4 p-6">
         <button
           onClick={prevSlide}
           disabled={currentSlide === 0}
@@ -331,10 +377,6 @@ export default function SlidePresentationRenderer({
         >
           <ArrowLeft size={20} />
         </button>
-
-        <div className="px-4 py-2 bg-surface border border-border rounded-lg text-sm">
-          {currentSlide + 1} / {slides.length}
-        </div>
 
         <button
           onClick={nextSlide}
@@ -354,7 +396,7 @@ export default function SlidePresentationRenderer({
       )}
 
       {/* Keyboard Help */}
-      <div className="absolute bottom-6 right-6 text-xs text-muted max-w-48">
+      <div className="absolute bottom-20 right-6 text-xs text-muted max-w-48">
         <div>← → Navigate slides</div>
         <div>Ctrl + scroll: Zoom</div>
         <div>Home/End: First/Last slide</div>

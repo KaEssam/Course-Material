@@ -3,6 +3,7 @@
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import { useEffect, useState } from 'react'
+import remarkGfm from 'remark-gfm'
 import { mdxComponents } from './MDXComponents'
 
 interface PresentationRendererProps {
@@ -101,7 +102,7 @@ export default function PresentationRenderer({ content }: PresentationRendererPr
         const mdxSource = await serialize(content, {
           parseFrontmatter: false,
           mdxOptions: {
-            remarkPlugins: [],
+            remarkPlugins: [remarkGfm],
             rehypePlugins: [],
             development: process.env.NODE_ENV === 'development',
           },
