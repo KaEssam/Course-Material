@@ -1,0 +1,399 @@
+---
+title: 'Session 3 - DDL & DML'
+description: 'data definition and manipulation and comprehensive query operations'
+tags:
+  [
+    'sql-server',
+    'ddl',
+    'dml',
+    'database-operations',
+    'sql-queries',
+    'constraints',
+    'foreign-keys',
+  ]
+---
+
+### Table of Contents
+
+1. [DDL – Data Definition Language](#ddl--data-definition-language)
+2. [Constraints & FOREIGN KEY Options](#constraints--foreign-key-options)
+3. [ALTER TABLE Examples](#alter-table-examples)
+4. [DELETE vs TRUNCATE vs DROP](#delete-vs-truncate-vs-drop)
+5. [Transaction Log](#-transaction-log-what-is-it)
+6. [DML – Data Manipulation Language](#dml--data-manipulation-language)
+7. [SQL Query Operations](#sql-query-operations)
+
+---
+
+# Session 3: DDL & DML - Data Definition and Manipulation Language
+
+## DDL – Data Definition Language
+
+DDL commands are used to define or modify the structure of the database schema (tables, schemas, indexes, etc.).
+
+| Command    | Description                                                   |
+| ---------- | ------------------------------------------------------------- |
+| `CREATE`   | Creates database objects (tables, schemas, etc.)              |
+| `ALTER`    | Modifies existing table structures                            |
+| `DROP`     | Deletes database objects permanently                          |
+| `TRUNCATE` | Removes all data from a table without logging individual rows |
+
+### Example: Create Database, Schema, and Table
+
+#### DATABASE
+
+- Create `DATABASE`
+
+```sql
+CREATE DATABASE CompanyDB;
+```
+
+- Delete (DROP) `DATABASE`
+
+```sql
+DROP DATABASE CompanyDB;
+```
+
+---
+
+#### SCHEMA
+
+- Create `SCHEMA`
+
+```sql
+--Use the new database
+USE CompanyDB;
+
+--Create a new schema
+CREATE SCHEMA hr;
+```
+
+- Delete (DROP) `SCHEMA`
+
+```sql
+DROP SCHEMA hr;
+```
+
+## Constraints & FOREIGN KEY Options
+
+### Constraints Overview
+
+| Constraint    | Description                           |
+| ------------- | ------------------------------------- |
+| `PRIMARY KEY` | Uniquely identifies each row          |
+| `FOREIGN KEY` | Enforces relationships between tables |
+| `UNIQUE`      | Ensures values are unique             |
+| `NOT NULL`    | Prevents null values                  |
+| `DEFAULT`     | Sets a default value if none provided |
+| `CHECK`       | Enforces a condition on values        |
+
+### FOREIGN KEY Options – `ON DELETE` / `ON UPDATE`
+
+You can control behavior when parent rows are deleted or updated.
+
+| Option        | Behavior                                             |
+| ------------- | ---------------------------------------------------- |
+| `CASCADE`     | Child rows are automatically updated/deleted         |
+| `SET NULL`    | Child FK values are set to NULL                      |
+| `SET DEFAULT` | Child FK values revert to their default              |
+| `NO ACTION`   | Prevents delete/update if dependent child rows exist |
+| `RESTRICT`    | Same as `NO ACTION` in SQL Server                    |
+
+### Example
+
+```sql
+CREATE TABLE hr.Departments (
+    DeptId INT PRIMARY KEY,
+    DeptName NVARCHAR(100) NOT NULL UNIQUE,
+    Location NVARCHAR(100)
+);
+
+CREATE TABLE hr.Employees (
+    EmpId INT PRIMARY KEY IDENTITY(1,1),
+    EmpName NVARCHAR(50) NOT NULL,
+    Email NVARCHAR(150) UNIQUE,
+    Salary DECIMAL(10,2) CHECK (Salary >= 3000),
+    DeptId INT DEFAULT 1,
+    HireDate DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (DeptId) REFERENCES hr.Departments(DeptId)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
+```
+
+---
+
+## ALTER TABLE Examples
+
+```sql
+-- Add column
+ALTER TABLE Employees ADD Email NVARCHAR(100);
+
+--Modify column
+ALTER TABLE Employees ALTER COLUMN EmpName NVARCHAR(150);
+
+-- Drop column
+ALTER TABLE Employees DROP COLUMN Email;
+
+-- Add Foreign Key
+ALTER TABLE Employees ADD CONSTRAINT FK_Employees_Departments FOREIGN KEY (DeptId) REFERENCES Departments(DeptId);
+```
+
+---
+
+## DELETE vs TRUNCATE vs DROP
+
+| Operation  | Affects Structure? | Logs Each Row? | Rollback Possible | Removes Data |
+| ---------- | ------------------ | -------------- | ----------------- | ------------ |
+| `DELETE`   | ❌ No              | ✅ Yes         | ✅ Yes            | ✅ Yes       |
+| `TRUNCATE` | ❌ No              | ❌ No          | ✅ Yes            | ✅ Yes       |
+| `DROP`     | ✅ Yes             | ❌ No          | ❌ No             | ✅ Yes       |
+
+---
+
+## 🟤 Transaction Log (What is it?)
+
+The **Transaction Log** records all changes to the database. It's critical for:
+
+- Rollback
+- Crash recovery
+- Log backups
+- Transactional consistency
+
+---
+
+## DML – Data Manipulation Language
+
+DML commands deal with manipulating the actual data inside tables.
+
+| Command  | Description            |
+| -------- | ---------------------- |
+| `INSERT` | Adds new rows          |
+| `UPDATE` | Modifies existing rows |
+| `DELETE` | Removes rows           |
+
+### Examples:
+
+```sql
+-- Insert
+INSERT INTO hr.Employee (SSN,FName, LName, BirthDate, Gender,DNum)
+VALUES (961001,'Karim', 'Essam', '1996-10-01', 'M',1);
+
+-- Update
+UPDATE hr.Employee SET DNum = 2 WHERE SSN = 961001;
+
+-- Delete
+DELETE FROM hr.Employee WHERE SSN = 961001;
+```
+
+## SQL Query Operations
+
+## 1. Basic SELECT
+
+**Purpose:** Retrieve all or specific columns from a table.
+
+```sql
+SELECT * FROM production.products;  -- All columns
+
+SELECT product_id, product_name, list_price FROM production.products;  -- Specific columns
+
+-- Example with expression
+SELECT product_name, list_price * 1.1 AS price_with_tax
+FROM production.products;
+```
+
+---
+
+## 2. ORDER BY
+
+**Purpose:** Sort results by one or more columns.
+
+```sql
+SELECT product_name, list_price
+FROM production.products
+ORDER BY list_price DESC;  -- Descending
+
+SELECT product_name, list_price
+FROM production.products
+ORDER BY product_name ASC; -- Ascending
+```
+
+---
+
+## 3. OFFSET / FETCH (Pagination)
+
+**Purpose:** Paginate results by skipping and fetching rows.
+
+```sql
+SELECT product_name, list_price
+FROM production.products
+ORDER BY list_price DESC
+OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY;  -- Page 2
+
+SELECT product_name
+FROM production.products
+ORDER BY product_name
+OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;  -- First page
+```
+
+---
+
+## 4. SELECT TOP
+
+**Purpose:** Return a limited number of top rows.
+
+```sql
+SELECT TOP 3 product_name, list_price
+FROM production.products
+ORDER BY list_price ASC;
+
+SELECT TOP 1 *
+FROM sales.orders
+ORDER BY order_date DESC;  -- Latest order
+```
+
+---
+
+## 5. SELECT DISTINCT
+
+**Purpose:** Eliminate duplicates and return unique values.
+
+```sql
+SELECT DISTINCT state FROM sales.customers;
+
+SELECT DISTINCT store_id FROM sales.orders;
+```
+
+---
+
+## 6. WHERE Clause
+
+**Purpose:** Filter rows based on conditions.
+
+```sql
+SELECT * FROM production.products
+WHERE list_price > 1000;
+
+SELECT * FROM sales.customers
+WHERE state = 'CA';
+```
+
+---
+
+## 7. NULL Filtering
+
+**Purpose:** Identify null or non-null values.
+
+```sql
+SELECT * FROM sales.customers
+WHERE phone IS NULL;
+
+SELECT * FROM sales.customers
+WHERE email IS NOT NULL;
+```
+
+---
+
+## 8. AND / OR
+
+**Purpose:** Combine multiple conditions.
+
+```sql
+SELECT * FROM sales.staffs
+WHERE active = 1 AND (phone IS NOT NULL OR email IS NOT NULL);
+
+SELECT * FROM sales.customers
+WHERE state = 'NY' OR city = 'Los Angeles';
+```
+
+---
+
+## 9. IN Operator
+
+**Purpose:** Match a value against a list of values.
+
+```sql
+SELECT * FROM production.products
+WHERE category_id IN (1, 2, 3);
+
+SELECT * FROM sales.customers
+WHERE state IN ('CA', 'NY', 'TX');
+```
+
+---
+
+## 10. BETWEEN
+
+**Purpose:** Filter values within an inclusive range.
+
+```sql
+SELECT * FROM production.products
+WHERE list_price BETWEEN 500 AND 1000;
+
+SELECT * FROM sales.orders
+WHERE order_date BETWEEN '2023-01-01' AND '2023-12-31';
+```
+
+---
+
+## 11. LIKE Operator
+
+**Purpose:** Pattern matching using wildcards (`%`, `_`).
+
+```sql
+SELECT * FROM sales.customers
+WHERE email LIKE '%gmail.com';
+
+SELECT * FROM sales.customers
+WHERE first_name LIKE 'A%';  -- Starts with A
+
+SELECT * FROM sales.customers
+WHERE last_name LIKE '%son'; -- Ends with 'son'
+```
+
+---
+
+## 12. Aliases
+
+**Purpose:** Rename columns or tables for clarity.
+
+```sql
+SELECT p.product_name AS Name, p.list_price AS Price
+FROM production.products p;
+
+SELECT c.first_name + ' ' + c.last_name AS FullName
+FROM sales.customers c;
+```
+
+---
+
+## 13. GROUP BY and HAVING
+
+**Purpose:** Aggregate data and filter groups.
+
+```sql
+-- Count products per category
+SELECT category_id, COUNT(*) AS TotalProducts
+FROM production.products
+GROUP BY category_id;
+
+-- Categories with more than 2 products
+SELECT category_id, COUNT(*) AS TotalProducts
+FROM production.products
+GROUP BY category_id
+HAVING COUNT(*) > 2;
+
+-- Customers with 3+ orders
+SELECT customer_id, COUNT(*) AS OrderCount
+FROM sales.orders
+GROUP BY customer_id
+HAVING COUNT(*) >= 3;
+```
+
+---
+
+## SQL Query Execution Order
+
+**Execution Order:**
+
+> `FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` →`DISTINCT` → `ORDER BY` → `OFFSET / FETCH / TOP`
