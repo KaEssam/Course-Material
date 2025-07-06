@@ -1,0 +1,580 @@
+---
+title: 'Session 4: Aggregate Functions, Built-in Functions, Joins, Subqueries, Views'
+description: 'Master advanced SQL Server features including aggregate functions, built-in functions, various join types, subqueries, and views'
+---
+
+## **1. Aggregate Functions**
+
+### Overview
+
+Aggregate functions produce a single summarized value from a group of rows. They are essential for generating totals, averages, counts, or identifying extremes in datasets. The `GROUP BY` clause organizes rows into subsets based on one or more columns, enabling calculations per group. The `HAVING` clause filters those groups based on the results of aggregate computations, functioning like a `WHERE` clause at the group level.
+
+### Use Cases:
+
+- Calculate total sales by region
+- Determine average purchase amount per customer segment
+- Analyze monthly inventory levels per product category
+
+### Common Aggregate Functions
+
+| Function | Description                          | Example                                  |
+| -------- | ------------------------------------ | ---------------------------------------- |
+| COUNT()  | Counts rows or non-null values       | `SELECT COUNT(*) FROM products;`         |
+| SUM()    | Computes the sum of a numeric column | `SELECT SUM(list_price) FROM products;`  |
+| AVG()    | Returns the average value            | `SELECT AVG(quantity) FROM order_items;` |
+| MAX()    | Identifies the largest value         | `SELECT MAX(price) FROM products;`       |
+| MIN()    | Identifies the smallest value        | `SELECT MIN(price) FROM products;`       |
+
+
+### `COUNT()` - How many records do we have?
+
+```sql
+-- Count all products
+SELECT COUNT(*) as total_products
+FROM production.products;
+```
+
+```sql
+-- Count customers who have phone numbers (excludes NULLs)
+SELECT COUNT(phone) as customers_with_phone
+FROM sales.customers;
+```
+
+### `SUM()` - Add up numeric values
+
+```sql
+-- What's our total inventory value?
+SELECT SUM(list_price) as total_inventory_value
+FROM production.products;
+```
+
+```sql
+-- Total revenue from completed orders
+SELECT SUM(quantity * list_price * (1 - discount)) as total_revenue
+FROM sales.order_items oi
+INNER JOIN sales.orders o ON oi.order_id = o.order_id
+WHERE o.order_status = 4;
+```
+
+### `AVG()` - Find the average
+
+```sql
+-- What's the average product price?
+SELECT AVG(list_price) as average_price
+FROM production.products;
+```
+
+```sql
+-- Average quantity per order item
+SELECT AVG(quantity) as avg_quantity
+FROM sales.order_items;
+```
+
+### `MAX()`/`MIN()` - Find extremes
+
+```sql
+-- Most expensive and cheapest products
+SELECT
+    MAX(list_price) as highest_price,
+    MIN(list_price) as lowest_price,
+    MAX(list_price) - MIN(list_price) as price_range
+FROM production.products;
+```
+
+---
+
+## **2. Built-in Functions**
+
+### Overview
+
+Built-in functions process string, numeric, and date/time values on a row-by-row basis. These tools are key to data preprocessing, transformation, and formatting.
+
+### Use Cases:
+
+- Clean and standardize inconsistent input
+- Derive new calculated columns
+- Format data for presentation or export
+
+### String Functions
+
+| Function        | Description                            | Example                          |
+| --------------- | -------------------------------------- | -------------------------------- |
+| LEN()           | Returns string length                  | `LEN(first_name)`                |
+| UPPER()/LOWER() | Changes case of characters             | `UPPER(email)`                   |
+| LEFT()/RIGHT()  | Extracts characters from a string      | `LEFT(phone, 3)`                 |
+| REPLACE()       | Substitutes one substring with another | `REPLACE(email, '.com', '.net')` |
+
+#### Example
+
+```sql
+-- Basic string operations
+SELECT
+    first_name,
+    last_name,
+    LEN(first_name) as name_length,
+    UPPER(first_name) as name_upper,
+    LOWER(last_name) as last_name_lower,
+    LEFT(first_name, 1) as first_initial,
+    first_name + ' ' + last_name as full_name
+FROM sales.customers
+WHERE customer_id <= 10;
+```
+
+```sql
+-- Phone number formatting
+SELECT
+    customer_id,
+    phone,
+    LEFT(phone, 3) as area_code,
+    RIGHT(phone, 4) as last_four,
+    '(' + LEFT(phone, 3) + ') ' + SUBSTRING(phone, 4, 3) + '-' + RIGHT(phone, 4) as formatted_phone
+FROM sales.customers
+WHERE phone IS NOT NULL AND customer_id <= 10;
+```
+
+### Numeric Functions
+
+| Function          | Description                          | Example                      |
+| ----------------- | ------------------------------------ | ---------------------------- |
+| ROUND()           | Rounds numbers to specified decimals | `ROUND(price, 2)`            |
+| ABS()             | Returns absolute value               | `ABS(-5)`                    |
+| CEILING()/FLOOR() | Rounds up/down to nearest integer    | `CEILING(4.3)`, `FLOOR(4.9)` |
+
+```sql
+-- Basic numeric operations
+SELECT
+    product_name,
+    list_price,
+    ROUND(list_price, 0) as rounded_price,
+    CEILING(list_price) as price_ceiling,
+    FLOOR(list_price) as price_floor,
+    ABS(list_price - 100) as difference_from_100
+FROM production.products
+WHERE product_id <= 10;
+```
+
+```sql
+-- Price calculations
+SELECT
+    product_name,
+    list_price,
+    list_price * 0.1 as ten_percent_discount,
+    ROUND(list_price * 0.9, 2) as sale_price
+FROM production.products
+WHERE product_id <= 10;
+```
+
+### Date Functions
+
+| Function       | Description                       | Example                       |
+| -------------- | --------------------------------- | ----------------------------- |
+| GETDATE()      | Returns current system date/time  | `SELECT GETDATE()`            |
+| YEAR()/MONTH() | Extracts year/month from date     | `YEAR(order_date)`            |
+| DATEDIFF()     | Calculates interval between dates | `DATEDIFF(DAY, start, end)`   |
+| DATEADD()      | Adds interval to a date           | `DATEADD(DAY, 7, order_date)` |
+
+#### Example
+
+```sql
+-- Basic date operations
+SELECT
+    order_id,
+    order_date,
+    GETDATE() as current_date,
+    YEAR(order_date) as order_year,
+    MONTH(order_date) as order_month,
+    DATENAME(MONTH, order_date) as month_name,
+    DATENAME(WEEKDAY, order_date) as weekday_name
+FROM sales.orders
+WHERE order_id <= 10;
+```
+
+```sql
+-- Date calculations
+SELECT
+    order_id,
+    order_date,
+    shipped_date,
+    DATEDIFF(DAY, order_date, shipped_date) as processing_days,
+    DATEADD(DAY, 30, order_date) as return_deadline
+FROM sales.orders
+WHERE shipped_date IS NOT NULL AND order_id <= 10;
+```
+
+---
+
+## 3. Joins
+
+### Overview
+
+Joins allow you to retrieve data from multiple tables by linking related fields. They are essential in normalized databases where data is logically split across entities.
+
+### Use Cases
+
+- Combine transactional and reference data
+- Enrich records with external information
+- Perform analytics across interconnected tables
+
+## Join Types
+
+### INNER JOIN
+
+> Returns only matching rows
+
+
+```SQL
+-- Products with assigned brands
+SELECT
+    p.product_name,
+    c.category_name,
+    p.list_price
+FROM production.products p
+INNER JOIN production.categories c ON p.category_id = c.category_id
+```
+
+![INNER JOIN](/images/sql-joins/INNER%20JOIN.avif)
+
+### LEFT JOIN
+
+> All rows from the left table + matched rows
+
+```SQL
+-- All products, even if they haven't sold
+SELECT
+    p.product_name,
+    b.brand_name,
+    COUNT(oi.order_id) as times_sold
+FROM production.products p
+INNER JOIN production.brands b ON p.brand_id = b.brand_id
+LEFT JOIN sales.order_items oi ON p.product_id = oi.product_id
+GROUP BY p.product_id, p.product_name, b.brand_name
+ORDER BY times_sold DESC;
+```
+
+![LEFT JOIN](/images/sql-joins/LEFT%20JOIN.avif)
+
+### RIGHT JOIN
+
+> All rows from the right table + matched rows
+
+```SQL
+-- All orders, even those without product records
+SELECT
+    o.order_id,
+    o.order_date,
+    p.product_name,
+    oi.quantity
+FROM production.products p
+RIGHT JOIN sales.order_items oi ON p.product_id = oi.product_id
+INNER JOIN sales.orders o ON oi.order_id = o.order_id
+```
+
+![RIGHT JOIN](/images/sql-joins/RIGHT%20JOIN.avif)
+
+### FULL OUTER JOIN
+
+> All rows from both tables
+
+```SQL
+-- Combined datasets with or without matches
+SELECT
+    p.product_name,
+    s.quantity as stock_quantity
+FROM production.products p
+FULL OUTER JOIN production.stocks s ON p.product_id = s.product_id AND s.store_id = 1
+```
+
+![FULL OUTER JOIN](/images/sql-joins/FULL%20OUTER%20JOIN.avif)
+
+### Self JOIN
+
+> A table joined to itself
+
+
+```SQL
+-- Employees and their managers in the same table
+
+SELECT
+    e.first_name + ' ' + e.last_name as employee_name,
+    m.first_name + ' ' + m.last_name as manager_name
+FROM sales.staffs e
+LEFT JOIN sales.staffs m ON e.manager_id = m.staff_id
+WHERE e.staff_id <= 20
+ORDER BY e.staff_id;
+```
+
+
+### Special Function: `COALESCE()`
+
+ #### What It Does:
+
+> `COALESCE()` returns the first non-null value from a list of expressions. It's useful > when dealing with nullable fields and ensuring fallback values are displayed.
+
+ #### Syntax
+
+COALESCE(expression1, expression2, ..., expressionN)
+
+```sql
+SELECT customer_id,
+       COALESCE(email, phone, 'No contact info') AS contact
+FROM customers;
+```
+This query returns the email if it exists, otherwise the phone, and if both are null, it shows 'No contact info'.
+
+  Use Cases
+ - Filling missing data with default values
+ - Choosing the first available data source
+ - Avoiding null in reports or exports
+ - Monthly departmental expense tracking
+ - Product performance summaries
+ - Course score distributions
+
+```sql
+-- Staff and their managers
+SELECT
+    e.first_name + ' ' + e.last_name as employee_name,
+    COALESCE(m.first_name + ' ' + m.last_name, 'No Manager') as manager_name
+FROM sales.staffs e
+LEFT JOIN sales.staffs m ON e.manager_id = m.staff_id
+ORDER BY e.staff_id;
+```
+
+![Self Join](/images/sql-joins/Self%20Join.avif)
+
+### Cross JOIN
+
+> Every combination of rows from both tables
+
+```SQL
+--  Matrix-like pairing of regions and products
+SELECT
+    b.brand_name,
+    c.category_name
+FROM production.brands b
+CROSS JOIN production.categories c
+WHERE b.brand_id <= 5 AND c.category_id <= 5
+ORDER BY b.brand_name, c.category_name;
+```
+
+![CROSS JOIN](/images/sql-joins/CROSS%20JOIN.avif)
+
+### Examples with aggregate functions
+
+```sql
+-- Orders by each store
+SELECT
+    s.store_name,
+    COUNT(o.order_id) as total_orders
+FROM sales.stores s
+LEFT JOIN sales.orders o ON s.store_id = o.store_id
+GROUP BY s.store_id, s.store_name
+ORDER BY total_orders DESC;
+```
+
+```sql
+-- Products by category
+SELECT
+    c.category_name,
+    COUNT(p.product_id) as product_count,
+    AVG(p.list_price) as avg_price
+FROM production.categories c
+LEFT JOIN production.products p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name;
+
+```
+
+```sql
+-- Staff with more than 10 orders
+SELECT
+    st.first_name + ' ' + st.last_name as staff_name,
+    COUNT(o.order_id) as total_orders
+FROM sales.staffs st
+INNER JOIN sales.orders o ON st.staff_id = o.staff_id
+GROUP BY st.staff_id, st.first_name, st.last_name
+HAVING COUNT(o.order_id) > 10
+ORDER BY total_orders DESC;
+
+```
+
+```sql
+-- Categories with average price above $100
+SELECT
+    c.category_name,
+    COUNT(p.product_id) as product_count,
+    AVG(p.list_price) as avg_price
+FROM production.categories c
+INNER JOIN production.products p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name
+HAVING AVG(p.list_price) > 100
+ORDER BY avg_price DESC;
+
+```
+
+---
+
+## 4. Subqueries
+
+### Conceptual Overview
+
+Subqueries are nested queries used within SELECT, WHERE, or FROM clauses. They are powerful tools for isolating logic, performing comparisons, or generating derived columns.
+
+### Use Cases
+
+- Perform calculations based on results of another query
+- Filter records using external conditions
+- Break down complex logic into manageable components
+
+### Subquery Contexts
+
+| Clause | Purpose                               |
+| ------ | ------------------------------------- |
+| SELECT | Return computed column                |
+| WHERE  | Condition based on another result set |
+| FROM   | Create inline views or derived tables |
+
+### Examples
+
+```sql
+-- Products above average price
+SELECT product_name, list_price
+FROM production.products
+WHERE list_price > (
+  SELECT AVG(list_price) FROM production.products
+);
+```
+
+```sql
+-- Customers who placed orders
+SELECT *
+FROM sales.customers
+WHERE customer_id IN (
+  SELECT customer_id FROM sales.orders
+);
+```
+
+### subquery in WHERE clause
+
+```sql
+-- Find products more expensive than average
+SELECT
+    product_name,
+    list_price,
+    (SELECT AVG(list_price) FROM production.products) as average_price
+FROM production.products
+WHERE list_price > (SELECT AVG(list_price) FROM production.products)
+ORDER BY list_price DESC;
+```
+
+### Subquery with IN
+
+```sql
+-- Customers who have placed orders
+SELECT
+    first_name + ' ' + last_name as customer_name,
+    email
+FROM sales.customers
+WHERE customer_id IN (
+    SELECT customer_id FROM sales.orders WHERE order_status = 4
+)
+ORDER BY customer_name;
+```
+
+### Subquery in SELECT clause
+
+```sql
+SELECT
+    c.first_name + ' ' + c.last_name as customer_name,
+    (SELECT COUNT(*) FROM sales.orders o WHERE o.customer_id = c.customer_id) as order_count
+FROM sales.customers c
+WHERE c.customer_id <= 10
+ORDER BY order_count DESC;
+```
+
+### Pros & Cons
+#### ✅ Benefits
+
+- Enhances filtering and dynamic logic
+- Allows modular query design
+- Useful in business rule implementation
+
+#### ❌ Drawbacks
+
+- Performance overhead on large datasets
+- Can be harder to debug or optimize
+
+---
+
+## 5. Views
+
+### Conceptual Overview
+
+A view is a virtual table based on a stored SELECT query. Views simplify access to complex logic, standardize analytics, and restrict access to sensitive data.
+
+### Use Cases
+
+- Create reusable reporting structures
+- Abstract complex joins or filters
+- Expose only necessary data to users
+
+### Example
+
+```sql
+CREATE VIEW product_summary AS
+SELECT
+    c.category_name,
+    COUNT(p.product_id) AS total_products,
+    AVG(p.list_price) as avg_price,
+    MIN(p.list_price) as min_price,
+    MAX(p.list_price) as max_price
+FROM production.products p
+INNER JOIN production.categories c ON p.category_id = c.category_id
+GROUP BY c.category_id, c.category_name;
+
+-- Use the view
+SELECT * FROM product_summary
+WHERE avg_price > 100
+ORDER BY avg_price DESC;
+```
+
+```sql
+-- Simple view for customer summary
+CREATE VIEW customer_summary AS
+SELECT
+    c.customer_id,
+    c.first_name + ' ' + c.last_name as customer_name,
+    c.email,
+    c.city,
+    c.state
+FROM sales.customers c;
+
+-- Use the view
+SELECT * FROM customer_summary
+WHERE state = 'CA'
+ORDER BY customer_name;
+```
+
+```sql
+-- View with calculations
+CREATE VIEW order_totals AS
+SELECT
+    o.order_id,
+    o.customer_id,
+    o.order_date,
+    SUM(oi.quantity * oi.list_price * (1 - oi.discount)) as order_total
+FROM sales.orders o
+INNER JOIN sales.order_items oi ON o.order_id = oi.order_id
+WHERE o.order_status = 4
+GROUP BY o.order_id, o.customer_id, o.order_date;
+```
+###
+
+#### ✅ Benefits
+
+- Promotes code reuse and abstraction
+- Supports role-based access
+- Improves query clarity and modularity
+
+#### ❌ Limitations
+
+- Limited write support
+- Can incur performance costs on complex queries
