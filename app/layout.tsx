@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning data-theme="light">
+    <html lang="en" suppressHydrationWarning>
       <body className="antialiased bg-background text-text min-h-screen flex flex-col">
         <ThemeProvider>
           {/* Header */}

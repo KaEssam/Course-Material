@@ -36,6 +36,12 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
 
     const initialTheme = savedTheme || 'light' // Default to light theme
     setTheme(initialTheme)
+    
+    // Set initial data-theme attribute
+    const root = window.document.documentElement
+    root.setAttribute('data-theme', initialTheme)
+    root.classList.add(initialTheme)
+    
     setMounted(true)
   }, [])
 
@@ -45,6 +51,9 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
     const root = window.document.documentElement
     root.classList.remove('light', 'dark')
     root.classList.add(theme)
+    
+    // Set data-theme attribute for CSS variables
+    root.setAttribute('data-theme', theme)
 
     // Save to localStorage
     localStorage.setItem('theme', theme)
