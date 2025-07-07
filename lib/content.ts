@@ -18,6 +18,8 @@ export interface Lecture {
   frontMatter: any
   hasAssignment: boolean
   assignmentVisible?: boolean
+  hasPractice: boolean
+  practiceVisible?: boolean
   visible?: boolean
 }
 
@@ -85,6 +87,10 @@ export function getLecturesForCourse(courseSlug: string, respectVisibility: bool
     const assignmentPath = path.join(courseDir, `${lectureSlug}.assignment.mdx`)
     const hasAssignment = fs.existsSync(assignmentPath)
 
+    // Check for practice file
+    const practicePath = path.join(courseDir, `${lectureSlug}.practice.mdx`)
+    const hasPractice = fs.existsSync(practicePath)
+
     // Get assignment visibility from assignment file frontmatter
     let assignmentVisible = true
     if (hasAssignment) {
@@ -98,6 +104,19 @@ export function getLecturesForCourse(courseSlug: string, respectVisibility: bool
       }
     }
 
+    // Get practice visibility from practice file frontmatter
+    let practiceVisible = true
+    if (hasPractice) {
+      try {
+        const practiceContents = fs.readFileSync(practicePath, 'utf8')
+        const { data: practiceData } = matter(practiceContents)
+        practiceVisible = practiceData.visible !== false
+      } catch (error) {
+        // If practice file can't be read, default to visible
+        practiceVisible = true
+      }
+    }
+
     return {
       slug: lectureSlug,
       title: data.title || formatTitle(lectureSlug),
@@ -106,6 +125,8 @@ export function getLecturesForCourse(courseSlug: string, respectVisibility: bool
       frontMatter: data,
       hasAssignment,
       assignmentVisible,
+      hasPractice,
+      practiceVisible,
       visible: data.visible !== false // Default to true if not specified
     }
   }).sort((a, b) => a.slug.localeCompare(b.slug))
@@ -115,7 +136,8 @@ export function getLecturesForCourse(courseSlug: string, respectVisibility: bool
     lectures = lectures.filter(lecture => lecture.visible !== false)
       .map(lecture => ({
         ...lecture,
-        assignmentVisible: respectVisibility ? lecture.assignmentVisible : true
+        assignmentVisible: respectVisibility ? lecture.assignmentVisible : true,
+        practiceVisible: respectVisibility ? lecture.practiceVisible : true
       }))
   }
 
@@ -136,6 +158,10 @@ export function getLecture(courseSlug: string, lectureSlug: string): Lecture | n
   const assignmentPath = path.join(coursesDirectory, courseSlug, `${lectureSlug}.assignment.mdx`)
   const hasAssignment = fs.existsSync(assignmentPath)
 
+  // Check for practice file
+  const practicePath = path.join(coursesDirectory, courseSlug, `${lectureSlug}.practice.mdx`)
+  const hasPractice = fs.existsSync(practicePath)
+
   return {
     slug: lectureSlug,
     title: data.title || formatTitle(lectureSlug),
@@ -143,6 +169,7 @@ export function getLecture(courseSlug: string, lectureSlug: string): Lecture | n
     content,
     frontMatter: data,
     hasAssignment,
+    hasPractice,
     visible: data.visible !== false
   }
 }
@@ -164,6 +191,29 @@ export function getAssignment(courseSlug: string, lectureSlug: string): Lecture 
     content,
     frontMatter: data,
     hasAssignment: false,
+    hasPractice: false,
+    visible: data.visible !== false
+  }
+}
+
+export function getPractice(courseSlug: string, lectureSlug: string): Lecture | null {
+  const filePath = path.join(coursesDirectory, courseSlug, `${lectureSlug}.practice.mdx`)
+
+  if (!fs.existsSync(filePath)) {
+    return null
+  }
+
+  const fileContents = fs.readFileSync(filePath, 'utf8')
+  const { data, content } = matter(fileContents)
+
+  return {
+    slug: `${lectureSlug}.practice`,
+    title: data.title || `${formatTitle(lectureSlug)} - Practice`,
+    description: data.description,
+    content,
+    frontMatter: data,
+    hasAssignment: false,
+    hasPractice: false,
     visible: data.visible !== false
   }
 }

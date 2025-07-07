@@ -12,6 +12,8 @@ interface LectureWithMaterials {
   frontMatter: any
   hasAssignment: boolean
   assignmentVisible?: boolean
+  hasPractice: boolean
+  practiceVisible?: boolean
   visible?: boolean
   materialsUrl?: string
   codeUrl?: string

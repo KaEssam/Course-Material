@@ -1,7 +1,7 @@
 'use client'
 
 import { Course, Lecture } from '@/lib/content'
-import { BookOpen, ChevronDown, Clipboard, FileText, Github, Play } from 'lucide-react'
+import { BookOpen, ChevronDown, Clipboard, FileText, Github, Play, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -115,6 +115,17 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
                             >
                               <Clipboard className="w-3.5 h-3.5 mr-1.5" />
                               Assignment
+                            </Link>
+                          )}
+
+                          {lecture.hasPractice && lecture.practiceVisible !== false && (
+                            <Link
+                              href={`/courses/${course.slug}/${lecture.slug}/practice`}
+                              className="btn btn-ghost text-xs py-1.5 px-3 hover:bg-green/5 hover:text-green border-green/20 shadow-soft hover:shadow-medium"
+                              title="Practice exercises available"
+                            >
+                              <Zap className="w-3.5 h-3.5 mr-1.5" />
+                              Practice
                             </Link>
                           )}
 
