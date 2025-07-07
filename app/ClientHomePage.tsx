@@ -29,53 +29,53 @@ interface ClientHomePageProps {
 
 export default function ClientHomePage({ courses }: ClientHomePageProps) {
   return (
-    <div className="space-y-6">
+    <div className="responsive-spacing-md zoom-container">
       {/* Header with Course Info */}
-      <div className="space-y-4 text-center">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-text-primary">
+      <div className="responsive-spacing-sm text-center">
+        <div className="responsive-spacing-sm">
+          <h1 className="text-responsive-2xl font-bold text-text-primary zoom-text">
             DEPI & ITI Courses
           </h1>
-          <p className="text-lg text-text-secondary">
+          <p className="text-responsive-lg text-text-secondary zoom-text">
             By Eng. Karim Essam
           </p>
-          <p className="max-w-2xl mx-auto text-sm text-text-muted">
-            software courses designed for DEPI and ITI students.
-            Interactive lessons And practical assignments
+          <p className="max-w-xs sm:max-w-lg md:max-w-2xl mx-auto text-responsive-sm text-text-muted px-2 sm:px-4 zoom-text">
+            Software courses designed for DEPI and ITI students.
+            Interactive lessons and practical assignments.
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex flex-col xs:flex-row flex-wrap justify-center gap-2 sm:gap-3 px-2 sm:px-4">
           <button
             onClick={() => {
               // Open the video file from public directory
               const videoUrl = '/Github - Made with Clipchamp.mp4';
               window.open(videoUrl, '_blank');
             }}
-            className="flex items-center gap-2 text-sm btn btn-ghost hover:bg-blue/10 hover:text-blue"
+            className="flex items-center justify-center gap-2 btn-responsive-sm btn btn-ghost hover:bg-blue/10 hover:text-blue mobile-friendly w-full xs:w-auto"
           >
-            <Video className="w-4 h-4" />
-            How to Submit Assignment
+            <Video className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="truncate">How to Submit Assignment</span>
           </button>
-            <button
+          <button
             onClick={() => window.open('https://github.com/KaEssam/Depi-Course-Material/tree/main', '_blank')}
-            className="flex items-center gap-2 text-sm btn btn-ghost hover:bg-purple/10 hover:text-purple"
-            >
-            <Github className="w-4 h-4" />
-            GitHub Repository
-            </button>
+            className="flex items-center justify-center gap-2 btn-responsive-sm btn btn-ghost hover:bg-purple/10 hover:text-purple mobile-friendly w-full xs:w-auto"
+          >
+            <Github className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="truncate">GitHub Repository</span>
+          </button>
         </div>
       </div>
 
       {/* Courses List */}
       {courses.length === 0 ? (
-        <div className="py-16 text-center">
-          <div className="max-w-md mx-auto card">
-            <p className="text-text-muted">No courses available yet</p>
+        <div className="py-8 sm:py-12 md:py-16 text-center px-2 sm:px-4">
+          <div className="max-w-xs sm:max-w-md mx-auto card">
+            <p className="text-text-muted text-responsive-sm">No courses available yet</p>
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="responsive-spacing-sm px-1 sm:px-2">
           {courses.map((course, index) => (
             <div
               key={course.slug}

@@ -6,6 +6,12 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'DEPI & ITI Courses | Eng. Karim Essam - Software Engineering',
   description: 'Comprehensive software development courses for DEPI and ITI students by Eng. Karim Essam. Interactive lessons, presentations, and practical assignments.',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
 }
 
 export default function RootLayout({
@@ -15,20 +21,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning data-theme="light">
-      <body className="antialiased bg-background text-text">
+      <body className="antialiased bg-background text-text min-h-screen flex flex-col">
         <ThemeProvider>
           {/* Header */}
           <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-            <div className="py-4 container-custom">
+            <div className="py-2 sm:py-3 md:py-4 responsive-container">
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="hidden sm:block">
-                    <h1 className="text-lg font-semibold text-text-primary">Karim Essam</h1>
-                    <p className="text-xs text-text-muted">Software Engineering Instructor</p>
+                <div className="flex items-center flex-1 min-w-0">
+                  <div className="min-w-0">
+                    <h1 className="text-sm font-semibold truncate sm:text-base md:text-lg text-text-primary">
+                      Karim Essam
+                    </h1>
+                    <p className="hidden text-xs truncate sm:text-sm text-text-muted xs:block">
+                      Software Engineering Instructor
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center flex-shrink-0 space-x-2 sm:space-x-3">
                   <ThemeToggle />
                 </div>
               </div>
@@ -36,22 +46,22 @@ export default function RootLayout({
           </header>
 
           {/* Main Content */}
-          <main className="container-custom section-spacing">
+          <main className="flex-1 min-w-0 responsive-container section-spacing">
             {children}
           </main>
 
           {/* Footer */}
-          <footer className="border-t border-border bg-surface/50">
-            <div className="py-8 container-custom">
-              <div className="space-y-4 text-center">
+          <footer className="mt-auto border-t border-border bg-surface/50">
+            <div className="responsive-padding responsive-container">
+              <div className="text-center responsive-spacing-sm">
                 
 
-                <div className="flex justify-center space-x-6 text-xs text-text-muted">
+                <div className="flex flex-wrap justify-center text-xs gap-x-3 gap-y-1 text-text-muted">
                   <span>© {new Date().getFullYear()}</span>
-                  <span>•</span>
+                  <span className="hidden xs:inline">•</span>
                   <span>DEPI & ITI Courses</span>
-                  <span>•</span>
-                  <span>Software Engineering</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="hidden sm:inline">Software Engineering</span>
                 </div>
               </div>
             </div>
