@@ -5,6 +5,16 @@ export default function HomePage() {
   // Get courses based on visibility settings in MDX frontmatter
   const courses = getAllCourses(true) // true = respect visibility from MDX files
 
+  // Enhance courses with materials and code data
+  const coursesWithMaterials = courses.map(course => ({
+    ...course,
+    lectures: course.lectures.map(lecture => ({
+      ...lecture,
+      materialsUrl: lecture.frontMatter?.materialsUrl,
+      codeUrl: lecture.frontMatter?.codeUrl
+    }))
+  }))
+
   return (
     <div className="space-y-16">
       {/* Hero Section */}
@@ -37,7 +47,7 @@ export default function HomePage() {
 
       {/* Courses Section */}
       <div className="space-y-6">
-        {courses.length === 0 ? (
+        {coursesWithMaterials.length === 0 ? (
           <div className="py-16 text-center">
             <div className="p-10 mx-auto max-w-lg card">
               <h3 className="mb-6 text-2xl font-semibold text-white">No Visible Content</h3>
@@ -62,7 +72,7 @@ export default function HomePage() {
         ) : (
           <div className="space-y-4">
             <div className="grid gap-4 mx-auto max-w-4xl">
-              {courses.map((course) => (
+              {coursesWithMaterials.map((course) => (
                 <div key={course.slug} className="hover-lift">
                   <CourseDropdown course={course} />
                 </div>

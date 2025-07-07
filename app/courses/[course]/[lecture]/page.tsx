@@ -1,6 +1,6 @@
 import MDXRenderer from '@/components/MDXRenderer'
-import { getLecture } from '@/lib/content'
-import { ArrowLeft, Clipboard, Presentation } from 'lucide-react'
+import { getLectureNavigation } from '@/lib/content'
+import { ArrowLeft, ArrowRight, BookOpen, Clipboard, Github, Presentation } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -16,11 +16,14 @@ interface LecturePageProps {
 
 export default function LecturePage({ params }: LecturePageProps) {
   const { course, lecture } = params
-  const lectureData = getLecture(course, lecture)
+  const navigationData = getLectureNavigation(course, lecture)
 
-  if (!lectureData) {
+  if (!navigationData) {
     notFound()
   }
+
+  const { current: lectureData, next: nextLecture, materialsUrl } = navigationData
+  const codeUrl = lectureData.frontMatter?.codeUrl
 
   return (
     <div className="space-y-6">
@@ -59,6 +62,30 @@ export default function LecturePage({ params }: LecturePageProps) {
             <Presentation size={14} />
             View as Presentation
           </Link>
+
+          {codeUrl && (
+            <a
+              href={codeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 bg-gray-600 text-white px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity text-sm"
+            >
+              <Github size={14} />
+              Source Code
+            </a>
+          )}
+
+          {materialsUrl && (
+            <a
+              href={materialsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity text-sm"
+            >
+              <BookOpen size={14} />
+              Course Materials
+            </a>
+          )}
         </div>
       </div>
 
@@ -67,18 +94,28 @@ export default function LecturePage({ params }: LecturePageProps) {
         <MDXRenderer content={lectureData.content} />
       </article>
 
-      {/* Assignment Button - Below Article */}
-      {lectureData.hasAssignment && (
-        <div className="flex justify-center pt-8">
+      {/* Assignment and Next Buttons - Below Article */}
+      <div className="flex justify-center gap-3 pt-8">
+        {lectureData.hasAssignment && (
           <Link
             href={`/assignments/${course}/${lecture}`}
             className="flex items-center gap-1.5 bg-secondary text-background px-4 py-2 rounded-md hover:opacity-90 transition-opacity text-sm"
           >
             <Clipboard size={14} />
-             View Assignment
+            View Assignment
           </Link>
-        </div>
-      )}
+        )}
+
+        {nextLecture && (
+          <Link
+            href={`/courses/${course}/${nextLecture.slug}`}
+            className="flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity text-sm"
+          >
+            Next Lecture
+            <ArrowRight size={14} />
+          </Link>
+        )}
+      </div>
 
       {/* Footer Navigation */}
       <div className="pt-6 mt-12 border-t border-border">
@@ -90,14 +127,25 @@ export default function LecturePage({ params }: LecturePageProps) {
             ← All Courses
           </Link>
 
-          {lectureData.hasAssignment && (
-            <Link
-              href={`/assignments/${course}/${lecture}`}
-              className="transition-colors text-secondary hover:text-accent"
-            >
-              Assignment →
-            </Link>
-          )}
+          <div className="flex gap-4">
+            {lectureData.hasAssignment && (
+              <Link
+                href={`/assignments/${course}/${lecture}`}
+                className="transition-colors text-secondary hover:text-accent"
+              >
+                Assignment →
+              </Link>
+            )}
+
+            {nextLecture && (
+              <Link
+                href={`/courses/${course}/${nextLecture.slug}`}
+                className="transition-colors text-green-400 hover:text-green-300"
+              >
+                Next: {nextLecture.title} →
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -106,16 +154,16 @@ export default function LecturePage({ params }: LecturePageProps) {
 
 export async function generateMetadata({ params }: LecturePageProps) {
   const { course, lecture } = params
-  const lectureData = getLecture(course, lecture)
+  const navigationData = getLectureNavigation(course, lecture)
 
-  if (!lectureData) {
+  if (!navigationData) {
     return {
       title: 'Lecture Not Found',
     }
   }
 
   return {
-    title: `${lectureData.title} | Technical Teaching Platform`,
-    description: lectureData.description,
+    title: `${navigationData.current.title} | Technical Teaching Platform`,
+    description: navigationData.current.description,
   }
 }

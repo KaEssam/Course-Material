@@ -163,6 +163,42 @@ export function getAssignment(courseSlug: string, lectureSlug: string): Lecture 
   }
 }
 
+export interface LectureNavigation {
+  current: Lecture
+  next?: Lecture
+  previous?: Lecture
+  materialsUrl?: string
+}
+
+export function getLectureNavigation(courseSlug: string, lectureSlug: string): LectureNavigation | null {
+  const currentLecture = getLecture(courseSlug, lectureSlug)
+  if (!currentLecture) {
+    return null
+  }
+
+  const allLectures = getLecturesForCourse(courseSlug, false)
+  const currentIndex = allLectures.findIndex(lecture => lecture.slug === lectureSlug)
+
+  if (currentIndex === -1) {
+    return {
+      current: currentLecture
+    }
+  }
+
+  const next = currentIndex < allLectures.length - 1 ? allLectures[currentIndex + 1] : undefined
+  const previous = currentIndex > 0 ? allLectures[currentIndex - 1] : undefined
+
+  // Check if materials URL is defined in frontmatter
+  const materialsUrl = currentLecture.frontMatter?.materialsUrl
+
+  return {
+    current: currentLecture,
+    next,
+    previous,
+    materialsUrl
+  }
+}
+
 function formatTitle(slug: string): string {
   return slug
     .split('-')
