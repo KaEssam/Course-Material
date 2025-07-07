@@ -1,6 +1,6 @@
 import MDXRenderer from '@/components/MDXRenderer'
 import { getLectureNavigation } from '@/lib/content'
-import { ArrowLeft, ArrowRight, BookOpen, Clipboard, Github, Presentation } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Clipboard, Github, Presentation, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -57,20 +57,40 @@ export default function LecturePage({ params }: LecturePageProps) {
         <div className="flex flex-wrap gap-3">
           <Link
             href={`/slides/${course}/${lecture}`}
-            className="flex items-center gap-1.5 bg-accent text-background px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity text-sm"
+            className="btn btn-ghost btn-responsive-sm hover:bg-orange/5 hover:text-orange border-orange/20 shadow-soft hover:shadow-medium"
           >
-            <Presentation size={14} />
+            <Presentation className="w-3.5 h-3.5 mr-1.5" />
             View as Presentation
           </Link>
+
+          {lectureData.hasAssignment && (
+            <Link
+              href={`/assignments/${course}/${lecture}`}
+              className="btn btn-ghost btn-responsive-sm hover:bg-yellow/5 hover:text-yellow border-yellow/20 shadow-soft hover:shadow-medium"
+            >
+              <Clipboard className="w-3.5 h-3.5 mr-1.5" />
+              Assignment
+            </Link>
+          )}
+
+          {lectureData.hasPractice && (
+            <Link
+              href={`/practices/${course}/${lecture}`}
+              className="btn btn-ghost btn-responsive-sm hover:bg-green/5 hover:text-green border-green/20 shadow-soft hover:shadow-medium"
+            >
+              <Zap className="w-3.5 h-3.5 mr-1.5" />
+              Practice
+            </Link>
+          )}
 
           {codeUrl && (
             <a
               href={codeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 bg-gray-600 text-white px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity text-sm"
+              className="btn btn-ghost btn-responsive-sm hover:bg-aqua/5 hover:text-aqua border-aqua/20 shadow-soft hover:shadow-medium"
             >
-              <Github size={14} />
+              <Github className="w-3.5 h-3.5 mr-1.5" />
               Source Code
             </a>
           )}
@@ -80,9 +100,9 @@ export default function LecturePage({ params }: LecturePageProps) {
               href={materialsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity text-sm"
+              className="btn btn-ghost btn-responsive-sm hover:bg-blue/5 hover:text-blue border-blue/20 shadow-soft hover:shadow-medium"
             >
-              <BookOpen size={14} />
+              <BookOpen className="w-3.5 h-3.5 mr-1.5" />
               Course Materials
             </a>
           )}
@@ -94,25 +114,35 @@ export default function LecturePage({ params }: LecturePageProps) {
         <MDXRenderer content={lectureData.content} />
       </article>
 
-      {/* Assignment and Next Buttons - Below Article */}
+      {/* Assignment, Practice and Next Buttons - Below Article */}
       <div className="flex justify-center gap-3 pt-8">
         {lectureData.hasAssignment && (
           <Link
             href={`/assignments/${course}/${lecture}`}
-            className="flex items-center gap-1.5 bg-secondary text-background px-4 py-2 rounded-md hover:opacity-90 transition-opacity text-sm"
+            className="btn btn-ghost btn-responsive-sm hover:bg-yellow/5 hover:text-yellow border-yellow/20 shadow-soft hover:shadow-medium"
           >
-            <Clipboard size={14} />
+            <Clipboard className="w-3.5 h-3.5 mr-1.5" />
             View Assignment
+          </Link>
+        )}
+
+        {lectureData.hasPractice && (
+          <Link
+            href={`/practices/${course}/${lecture}`}
+            className="btn btn-ghost btn-responsive-sm hover:bg-green/5 hover:text-green border-green/20 shadow-soft hover:shadow-medium"
+          >
+            <Zap className="w-3.5 h-3.5 mr-1.5" />
+            Practice Exercises
           </Link>
         )}
 
         {nextLecture && (
           <Link
             href={`/courses/${course}/${nextLecture.slug}`}
-            className="flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity text-sm"
+            className="btn btn-ghost btn-responsive-sm hover:bg-blue/5 hover:text-blue border-blue/20 shadow-soft hover:shadow-medium"
           >
             Next Lecture
-            <ArrowRight size={14} />
+            <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
           </Link>
         )}
       </div>
@@ -131,16 +161,25 @@ export default function LecturePage({ params }: LecturePageProps) {
             {lectureData.hasAssignment && (
               <Link
                 href={`/assignments/${course}/${lecture}`}
-                className="transition-colors text-secondary hover:text-accent"
+                className="transition-colors text-yellow hover:text-yellow/80"
               >
                 Assignment →
+              </Link>
+            )}
+
+            {lectureData.hasPractice && (
+              <Link
+                href={`/practices/${course}/${lecture}`}
+                className="transition-colors text-green hover:text-green/80"
+              >
+                Practice →
               </Link>
             )}
 
             {nextLecture && (
               <Link
                 href={`/courses/${course}/${nextLecture.slug}`}
-                className="transition-colors text-green-400 hover:text-green-300"
+                className="transition-colors text-blue hover:text-blue/80"
               >
                 Next: {nextLecture.title} →
               </Link>
