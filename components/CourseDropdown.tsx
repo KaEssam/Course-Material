@@ -41,6 +41,12 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
                   <span className="whitespace-nowrap text-xs">{course.lectures.filter(l => l.hasAssignment).length} assignment{course.lectures.filter(l => l.hasAssignment).length !== 1 ? 's' : ''}</span>
                 </span>
               )}
+              {course.lectures.some(l => l.hasPractice) && (
+                <span className="flex items-center gap-1 sm:gap-1.5 bg-surface/80 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md border border-border/30 text-text-secondary group-hover/header:border-orange/20 group-hover/header:text-orange/80 transition-colors">
+                  <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                  <span className="whitespace-nowrap text-xs">{course.lectures.filter(l => l.hasPractice).length} practice{course.lectures.filter(l => l.hasPractice).length !== 1 ? 's' : ''}</span>
+                </span>
+              )}
             </div>
           </div>
         </div>

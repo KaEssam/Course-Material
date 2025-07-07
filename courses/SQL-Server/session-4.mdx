@@ -1,6 +1,10 @@
 ---
 title: 'Session 4: Aggregate Functions, Built-in Functions, Joins, Subqueries, Views'
 description: 'Master advanced SQL Server features including aggregate functions, built-in functions, various join types, subqueries, and views'
+tags:
+  ['Aggregate Functions', 'Built-in Functions', 'Joins', 'Subqueries', 'Views']
+materialsUrl: 'https://github.com/KaEssam/Depi-Course-Material/tree/main/StoreDB%20-%20Database'
+codeUrl: 'https://github.com/KaEssam/Depi-Course-Material/tree/main/1%20-%20SQL%20Server/4%20-%20Session%204'
 ---
 
 ## **1. Aggregate Functions**
@@ -24,7 +28,6 @@ Aggregate functions produce a single summarized value from a group of rows. They
 | AVG()    | Returns the average value            | `SELECT AVG(quantity) FROM order_items;` |
 | MAX()    | Identifies the largest value         | `SELECT MAX(price) FROM products;`       |
 | MIN()    | Identifies the smallest value        | `SELECT MIN(price) FROM products;`       |
-
 
 ### `COUNT()` - How many records do we have?
 
@@ -221,7 +224,6 @@ Joins allow you to retrieve data from multiple tables by linking related fields.
 
 > Returns only matching rows
 
-
 ```SQL
 -- Products with assigned brands
 SELECT
@@ -290,7 +292,6 @@ FULL OUTER JOIN production.stocks s ON p.product_id = s.product_id AND s.store_i
 
 > A table joined to itself
 
-
 ```SQL
 -- Employees and their managers in the same table
 
@@ -303,14 +304,13 @@ WHERE e.staff_id <= 20
 ORDER BY e.staff_id;
 ```
 
-
 ### Special Function: `COALESCE()`
 
- #### What It Does:
+#### What It Does:
 
 > `COALESCE()` returns the first non-null value from a list of expressions. It's useful > when dealing with nullable fields and ensuring fallback values are displayed.
 
- #### Syntax
+#### Syntax
 
 COALESCE(expression1, expression2, ..., expressionN)
 
@@ -319,15 +319,17 @@ SELECT customer_id,
        COALESCE(email, phone, 'No contact info') AS contact
 FROM customers;
 ```
+
 This query returns the email if it exists, otherwise the phone, and if both are null, it shows 'No contact info'.
 
-  Use Cases
- - Filling missing data with default values
- - Choosing the first available data source
- - Avoiding null in reports or exports
- - Monthly departmental expense tracking
- - Product performance summaries
- - Course score distributions
+Use Cases
+
+- Filling missing data with default values
+- Choosing the first available data source
+- Avoiding null in reports or exports
+- Monthly departmental expense tracking
+- Product performance summaries
+- Course score distributions
 
 ```sql
 -- Staff and their managers
@@ -491,6 +493,7 @@ ORDER BY order_count DESC;
 ```
 
 ### Pros & Cons
+
 #### ✅ Benefits
 
 - Enhances filtering and dynamic logic
@@ -566,6 +569,7 @@ INNER JOIN sales.order_items oi ON o.order_id = oi.order_id
 WHERE o.order_status = 4
 GROUP BY o.order_id, o.customer_id, o.order_date;
 ```
+
 ###
 
 #### ✅ Benefits
