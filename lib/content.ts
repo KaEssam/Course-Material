@@ -37,16 +37,21 @@ export function getAllCourses(respectVisibility: boolean = false): Course[] {
     // Check if there's a course-level config file
     const courseConfigPath = path.join(coursesDirectory, courseSlug, '_course.mdx')
     let courseVisible = true
+    let courseTitle = formatTitle(courseSlug) // Default fallback
+    let courseDescription
 
     if (fs.existsSync(courseConfigPath)) {
       const courseConfigContents = fs.readFileSync(courseConfigPath, 'utf8')
       const { data } = matter(courseConfigContents)
       courseVisible = data.visible !== false
+      courseTitle = data.title || courseTitle // Use title from _course.mdx if available
+      courseDescription = data.description
     }
 
     return {
       slug: courseSlug,
-      title: formatTitle(courseSlug),
+      title: courseTitle,
+      description: courseDescription,
       lectures,
       visible: courseVisible
     }
