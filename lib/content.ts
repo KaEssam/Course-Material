@@ -75,7 +75,7 @@ export function getLecturesForCourse(courseSlug: string, respectVisibility: bool
   }
 
   const files = fs.readdirSync(courseDir)
-    .filter(name => name.endsWith('.mdx') && !name.endsWith('.assignment.mdx') && !name.startsWith('_'))
+    .filter(name => name.endsWith('.mdx') && !name.endsWith('.assignment.mdx') && !name.endsWith('.practice.mdx') && !name.startsWith('_'))
 
   let lectures = files.map(fileName => {
     const lectureSlug = fileName.replace('.mdx', '')
