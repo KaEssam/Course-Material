@@ -3,6 +3,7 @@ title: 'Session 5: CASE, NULL Handling, CTEs, Ranking, PIVOT, Set Operations'
 tags:
   ['CASE WHEN', 'NULL Handling', 'CTE', 'Ranking Functions', 'PIVOT', 'Set Operators']
 materialsUrl: 'https://github.com/KaEssam/Depi-Course-Material/tree/main/StoreDB%20-%20Database'
+codeUrl:'https://github.com/KaEssam/Depi-Course-Material/tree/main/1%20-%20SQL%20Server/5%20-%20Session%205'
 
 ---
 
@@ -26,6 +27,7 @@ END
 ```
 
 ### Purpose and Benefits
+
 - **Why use it:** Transform data during retrieval without modifying the original table
 - **Problems it solves:**
   - Categorizing data (e.g., age groups, salary ranges)
@@ -63,6 +65,7 @@ NULL values can break calculations and comparisons. These functions offer safe h
 - `NULLIF`: Returns NULL if two expressions are equal
 
 ### Purpose and Benefits
+
 - **Why use them:** Handle NULL values gracefully without complex conditional logic
 - **Problems they solve:**
   - Providing default values for NULL columns
@@ -73,6 +76,7 @@ NULL values can break calculations and comparisons. These functions offer safe h
 ### Examples with StoreDB
 
 #### COALESCE Function
+
 ```sql
 -- COALESCE(expression1, expression2, default)
 SELECT
@@ -86,6 +90,7 @@ ORDER BY customer_id;
 ```
 
 #### ISNULL Function
+
 ```sql
 -- ISNULL
 SELECT
@@ -108,6 +113,7 @@ A Common Table Expression (CTE) is a temporary named result set that exists with
 **What it does:** Creates a temporary, named query result that can be used like a table within the main query.
 
 ### Syntax
+
 ```sql
 WITH cte_name (column1, column2, ...) AS (
     -- CTE query definition
@@ -118,6 +124,7 @@ SELECT * FROM cte_name;
 ```
 
 ### Purpose and Benefits
+
 - **Why use it:** Improve query readability, avoid repetitive subqueries, enable recursive operations
 - **Problems it solves:**
   - Complex nested queries become more readable
@@ -155,12 +162,14 @@ ORDER BY ep.list_price DESC;
 These are window functions that assign ranking values to rows in a result set. They differ in how they handle ties (duplicate values).
 
 **What they do:**
+
 - **ROW_NUMBER():** Assigns unique sequential numbers (1, 2, 3, 4...)
 - **RANK():** Assigns ranks with gaps after ties (1, 2, 2, 4...)
 - **DENSE_RANK():** Assigns ranks without gaps after ties (1, 2, 2, 3...)
 - **NTILE(n):** Divides rows into `n` buckets and assigns a bucket number (1 to n)
 
 ### Syntax
+
 ```sql
 ROW_NUMBER() OVER (ORDER BY column)
 RANK() OVER (ORDER BY column)
@@ -169,6 +178,7 @@ NTILE(n) OVER (ORDER BY column)
 ```
 
 ### Purpose and Benefits
+
 - **Why use them:** Assign rankings, create numbered lists, handle pagination
 - **Problems they solve:**
   - Creating leaderboards
@@ -177,6 +187,7 @@ NTILE(n) OVER (ORDER BY column)
 - **Advantages:** Efficient ranking at database level, handles ties appropriately
 
 **ROW_NUMBER():**
+
 ```sql
 SELECT
   product_id,
@@ -191,6 +202,7 @@ FROM
 ```
 
 **RANK():**
+
 ```sql
 SELECT
   product_id,
@@ -218,6 +230,7 @@ FROM
 ```
 
 **NTILE(n):**
+
 ```sql
 CREATE TABLE sales.ntile (
   v INT NOT NULL
@@ -243,8 +256,8 @@ FROM
 
 ```
 
-
 **Example Showing All Four:**
+
 ```sql
 SELECT
     p.product_name,
@@ -260,7 +273,6 @@ JOIN production.categories c ON p.category_id = c.category_id
 GROUP BY p.product_id, p.product_name, c.category_name
 ORDER BY total_revenue DESC;
 ```
-
 
 ### Comparison Table
 
@@ -280,6 +292,7 @@ ORDER BY total_revenue DESC;
 `PIVOT` transforms rows into columns, to restructure rows into columns for reporting and comparison.
 
 ### Syntax
+
 ```sql
 -- PIVOT
 SELECT ...
@@ -291,6 +304,7 @@ PIVOT (
 ```
 
 ### Purpose and Benefits
+
 - **Why use them:** Reshape data for reporting, create crosstab reports, normalize/denormalize data
 - **Problems they solve:**
   - Creating summary reports with categories as columns
@@ -384,7 +398,6 @@ UNION
 SELECT first_name, last_name FROM sales.customers;
 ```
 
-
 **INTERSECT:**
 
 ```sql
@@ -393,8 +406,6 @@ INTERSECT
 SELECT city FROMsales.stores
 ORDER BYcity;`
 ```
-
-
 
 **EXCEPT:**
 
@@ -416,24 +427,28 @@ SELECT product_id FROM sales.order_items;
 ### When to Use Each Operator:
 
 **Use UNION when:**
+
 - Combining data from similar tables
 - Creating comprehensive views
 - You need to remove duplicates
 - Merging historical and current data
 
 **Use UNION ALL when:**
+
 - You want to keep all records including duplicates
 - Performance is critical
 - You're sure there are no duplicates
 - You need to count total occurrences
 
 **Use INTERSECT when:**
+
 - Finding common records between datasets
 - Identifying overlap in data
 - Data validation between systems
 - Finding customers in multiple segments
 
 **Use EXCEPT when:**
+
 - Finding records that exist in one set but not another
 - Identifying missing data
 - Data quality analysis
