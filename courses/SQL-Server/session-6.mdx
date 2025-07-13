@@ -1,0 +1,662 @@
+---
+title: 'Session 6: Variables, Flow Control, Functions, Stored Procedures,Indexes,Triggers '
+tags: [Variables, Flow Control, Functions, Stored Procedures, Indexes, Triggers]
+materialsUrl: 'https://github.com/KaEssam/Depi-Course-Material/tree/main/StoreDB%20-%20Database'
+---
+
+## Table of Contents
+
+1. [Variables](#variables)
+2. [Flow Control](#flow-control)
+3. [Functions](#functions)
+4. [Stored Procedures](#stored-procedures)
+
+---
+
+## Variables
+
+### Definition
+
+Variables in SQL Server are temporary storage locations that hold data values during the execution of a batch, stored procedure, or function. They allow you to store and manipulate data within your SQL code.
+
+### Local Variables
+
+**What it does:** Stores data temporarily within the scope of a batch, stored procedure, or function.
+
+**Syntax:**
+
+```sql
+DECLARE @variable_name data_type [= initial_value];
+SET @variable_name = value;
+
+-- OR
+
+SELECT @variable_name = value FROM table;
+```
+
+### Global Variables
+
+**What it does:** System-defined variables that provide information about the SQL Server instance and current session.
+**Syntax:**
+
+```sql
+@@variable_name
+```
+
+```sql
+SELECT
+
+@@SERVERNAME AS server_name,
+
+@@VERSION AS sql_version,
+
+@@SPID AS session_id,
+
+@@ROWCOUNT AS last_rowcount,
+
+@@ERROR AS last_error,
+
+@@IDENTITY AS last_identity,
+
+@@TRANCOUNT AS transaction_count;
+```
+
+### Purpose and Benefits
+
+- **Why use them:** Store intermediate values, pass data between statements, control flow
+- **Problems they solve:**
+  - Storing calculation results
+  - Parameterizing dynamic queries
+  - Controlling procedural logic
+- **Advantages:** Improved code readability, reduced redundant calculations, flexible logic
+
+### Real-World Use Cases
+
+1. **E-commerce:** Store customer ID to use across multiple operations
+2. **Analytics:** Calculate running totals or percentages
+3. **Data Processing:** Store configuration values or thresholds
+
+### Examples
+
+```sql
+-- Declare a variable
+DECLARE @customer_count INT;
+
+-- initialize a variable
+SET @customer_count = (SELECT COUNT(*) FROM sales.customers);
+
+-- Use the variable
+SELECT 'Total customers: ' + CAST(@customer_count AS VARCHAR(10)) AS message;
+```
+
+**Global Variables Example:**
+
+```sql
+-- Common global variables
+SELECT
+
+    @@VERSION AS SQLServerVersion,
+
+    @@SERVERNAME AS ServerName,
+
+    @@ROWCOUNT AS LastRowsAffected,
+
+    @@ERROR AS LastErrorNumber;
+
+```
+
+### Tips and Best Practices
+
+- Always initialize variables to avoid NULL values
+- Use meaningful variable names with @ prefix
+- Variables are case-insensitive but use consistent naming
+- Variables lose their values when the batch ends
+
+---
+
+## Flow Control
+
+### Definition
+
+Flow control statements allow you to control the execution path of your SQL code based on conditions, similar to programming languages.
+
+**What they do:**
+
+- **IF/ELSE:** Conditional execution of statements
+- **WHILE:** Loop execution based on conditions
+- **IIF():** Inline conditional function (SQL Server 2012+)
+- **IF EXISTS/IF NOT EXISTS:** Check for data existence
+
+**Syntax:**
+
+```sql
+-- IF statement
+IF condition
+    statement_or_block
+[ELSE
+    statement_or_block]
+
+-- WHILE loop
+WHILE condition
+    statement_or_block
+
+-- IIF function
+IIF(condition, true_value, false_value)
+
+-- IF EXISTS
+IF EXISTS (SELECT * FROM table WHERE condition)
+    statement_or_block
+```
+
+## IF Statement
+
+**What it does:** Executes code conditionally based on a Boolean expression.
+
+**Syntax:**
+
+```sql
+
+IF condition
+
+    statement_or_block
+
+[ELSE
+
+    statement_or_block]
+
+```
+
+**IF Statement Example:**
+
+```sql
+
+DECLARE @product_count INT;
+SELECT @product_count = COUNT(*) FROM production.products WHERE list_price > 1000;
+
+IF @product_count > 50
+
+BEGIN
+
+    PRINT 'High-end product catalog is well-stocked';
+
+    PRINT 'Consider running a premium product promotion';
+
+END
+
+ELSE
+
+BEGIN
+
+    PRINT 'Limited high-end products available';
+
+    PRINT 'Consider restocking premium items';
+
+END
+
+```
+
+## IF EXISTS & IF NOT EXISTS
+
+**What it does:** Checks for the existence of data or database objects before executing code.
+
+**Syntax:**
+
+```sql
+
+IF EXISTS (SELECT 1 FROM table WHERE condition)
+    statement_or_block
+
+IF NOT EXISTS (SELECT 1 FROM table WHERE condition)
+    statement_or_block
+
+```
+
+**IF EXISTS Example:**
+
+```sql
+
+-- Check if customer exists before creating an order
+
+DECLARE @customer_id INT = 999;
+
+
+
+IF EXISTS (SELECT 1 FROM sales.customers WHERE customer_id = @customer_id)
+
+BEGIN
+
+    PRINT 'Customer found. Proceeding with order creation...';
+
+    -- Order creation logic would go here
+
+END
+
+ELSE
+
+BEGIN
+
+    PRINT 'Customer not found. Please create customer record first.';
+
+END
+
+```
+
+## WHILE Loop
+
+**What it does:** Repeatedly executes a statement or block while a condition is true.
+
+**Syntax:**
+
+```sql
+
+WHILE condition
+BEGIN
+    statement_or_block
+    [BREAK | CONTINUE]
+END
+```
+
+**WHILE Loop Example:**
+
+```sql
+
+-- Update inventory in batches
+
+DECLARE @batch_size INT = 100;
+
+DECLARE @rows_updated INT = 1;
+
+
+
+WHILE @rows_updated > 0
+
+BEGIN
+
+    UPDATE TOP (@batch_size) production.stocks
+
+    SET quantity = quantity + 10
+
+    WHERE quantity < 5;
+
+    SET @rows_updated = @@ROWCOUNT;
+
+    PRINT 'Updated ' + CAST(@rows_updated AS VARCHAR(10)) + ' records';
+
+END
+
+```
+
+### Purpose and Benefits
+
+- **Decision Making:** Execute different code paths based on conditions
+- **Data Validation:** Check data integrity before operations
+- **Dynamic Processing:** Handle different scenarios in one query
+- **Error Prevention:** Avoid operations on non-existent data
+
+### Real-World Use Cases
+
+1. **Inventory Management:** Check stock levels before processing orders
+2. **User Management:** Validate user permissions before granting access
+3. **Data Classification:** Categorize data based on business rules
+
+---
+
+## Functions
+
+### Definition
+
+User-defined functions (UDFs) are reusable code blocks that accept parameters, perform operations, and return values. They encapsulate business logic and promote code reusability.
+
+## Scalar Functions
+
+- Return a single value (scalar data type)
+- Can be used anywhere an expression is allowed
+- Similar to built-in functions like LEN(), DATEADD()
+
+**Syntax:**
+
+```sql
+
+CREATE FUNCTION function_name (@parameter1 datatype, @parameter2 datatype)
+
+RETURNS return_datatype
+
+AS
+
+BEGIN
+    -- Function logic
+    RETURN value;
+
+END
+```
+
+**Scalar Function Example:**
+
+```sql
+
+-- Function to calculate total order value with tax
+
+CREATE FUNCTION dbo.CalculateOrderTotal(@order_id INT, @tax_rate DECIMAL(4,2))
+
+RETURNS DECIMAL(10,2)
+
+AS
+
+BEGIN
+
+    DECLARE @total DECIMAL(10,2);
+
+    SELECT @total = SUM(quantity * list_price * (1 - discount))
+
+    FROM sales.order_items
+
+    WHERE order_id = @order_id;
+
+    RETURN @total * (1 + @tax_rate);
+
+END;
+
+-- Usage
+
+SELECT dbo.CalculateOrderTotal(1615, 0.08) AS TotalWithTax;
+
+```
+
+## **Table-Valued Functions:**
+
+- Return a table as the result
+- Can be used in FROM clause like a table or view
+- Two subtypes: Inline and Multi-statement
+
+### Inline Functions
+
+**What it does:** Returns a table result set and can be used like a view with parameters.
+
+**Syntax:**
+
+```sql
+
+CREATE FUNCTION function_name (@parameter1 datatype)
+
+RETURNS TABLE
+
+AS
+
+RETURN
+
+(
+
+    SELECT columns FROM table WHERE condition
+
+);
+
+```
+
+```sql
+-- Function to get products by category
+
+CREATE FUNCTION dbo.GetProductsByCategory(@category_id INT)
+
+RETURNS TABLE
+
+AS
+
+RETURN
+
+(
+
+    SELECT
+
+        p.product_id,
+
+        p.product_name,
+
+        p.list_price,
+
+        b.brand_name,
+
+        c.category_name
+
+    FROM production.products p
+
+    INNER JOIN production.brands b ON p.brand_id = b.brand_id
+
+    INNER JOIN production.categories c ON p.category_id = c.category_id
+
+    WHERE p.category_id = @category_id
+
+);
+
+-- Usage
+
+SELECT * FROM dbo.GetProductsByCategory(6); -- Mountain Bikes
+```
+
+### Multi-Statement Functions
+
+**What it does:** Returns a table result set built through multiple statements.
+
+**Syntax:**
+
+```sql
+
+CREATE FUNCTION function_name (@parameter1 datatype)
+
+RETURNS @return_table TABLE (column1 datatype, column2 datatype)
+
+AS
+
+BEGIN
+
+    -- Multiple statements
+
+    INSERT INTO @return_table
+
+    SELECT columns FROM table WHERE condition;
+
+    RETURN;
+
+END
+
+```
+
+```sql
+
+-- Function to get customer order summary
+
+CREATE FUNCTION dbo.GetCustomerOrderSummary(@customer_id INT)
+
+RETURNS @summary TABLE
+
+(
+
+    OrderYear INT,
+
+    OrderCount INT,
+
+    TotalAmount DECIMAL(10,2),
+
+    AvgOrderValue DECIMAL(10,2)
+
+)
+
+AS
+
+BEGIN
+
+    INSERT INTO @summary
+
+    SELECT
+
+        YEAR(o.order_date) as OrderYear,
+
+        COUNT(*) as OrderCount,
+
+        SUM(oi.quantity * oi.list_price * (1 - oi.discount)) as TotalAmount,
+
+        AVG(oi.quantity * oi.list_price * (1 - oi.discount)) as AvgOrderValue
+
+    FROM sales.orders o
+
+    INNER JOIN sales.order_items oi ON o.order_id = oi.order_id
+
+    WHERE o.customer_id = @customer_id
+
+    GROUP BY YEAR(o.order_date);
+
+    RETURN;
+
+END;
+
+
+
+-- Usage
+
+SELECT * FROM dbo.GetCustomerOrderSummary(1);
+
+```
+
+### Purpose and Benefits
+
+- **Code Reusability:** Write once, use many times
+- **Modularity:** Break complex logic into manageable pieces
+- **Consistency:** Ensure uniform calculations across the application
+- **Performance:** Inline functions can be optimized by the query engine
+
+### Real-World Use Cases
+
+1. **Finance:** Calculate tax, interest, or commission rates
+2. **E-commerce:** Determine shipping costs or discounts
+3. **HR Systems:** Calculate employee benefits or working days
+
+### Comparison: Scalar vs Table-Valued Functions
+
+| Feature          | Scalar Functions           | Table-Valued Functions   |
+| ---------------- | -------------------------- | ------------------------ |
+| **Return Type**  | Single value               | Table (rows and columns) |
+| **Usage**        | SELECT, WHERE, expressions | FROM, JOIN clauses       |
+| **Performance**  | Can be slow (row-by-row)   | Generally better         |
+| **Complexity**   | Simple calculations        | Complex data retrieval   |
+| **Caching**      | Results not cached         | Results can be cached    |
+| **Optimization** | Limited optimization       | Better optimization      |
+
+### Tips and Best Practices
+
+- Avoid using scalar functions in WHERE clauses (performance impact)
+- Prefer inline functions over multi-statement when possible
+- Don't use functions for operations that modify data
+- Keep functions deterministic when possible
+
+---
+
+## Stored Procedures
+
+### Definition
+
+A stored procedure is a precompiled collection of SQL statements stored in the database. It can accept parameters, execute multiple statements, and return results or status values.
+
+**What it does:**
+
+- Executes a series of SQL statements as a single unit, with optional input/output parameters.
+- Encapsulate business logic and complex operations in reusable, executable database objects.
+
+**Syntax:**
+
+```sql
+
+CREATE PROCEDURE procedure_name
+    @parameter1 datatype [= default_value] [OUTPUT],
+    @parameter2 datatype [= default_value]
+AS
+BEGIN
+    -- SQL statements
+    -- Business logic
+    -- Return statements
+END;
+```
+
+```sql
+
+-- Procedure to get customer order history
+CREATE PROCEDURE sp_GetCustomerOrders
+    @customer_id INT,
+    @start_date DATE = NULL,
+    @end_date DATE = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+
+        o.order_id,
+
+        o.order_date,
+
+        o.order_status,
+
+        SUM(oi.quantity * oi.list_price * (1 - oi.discount)) as order_total
+
+    FROM sales.orders o
+
+    INNER JOIN sales.order_items oi ON o.order_id = oi.order_id
+
+    WHERE o.customer_id = @customer_id
+
+        AND (@start_date IS NULL OR o.order_date >= @start_date)
+
+        AND (@end_date IS NULL OR o.order_date <= @end_date)
+
+    GROUP BY o.order_id, o.order_date, o.order_status
+
+    ORDER BY o.order_date DESC;
+
+END;
+
+
+
+-- Usage
+
+EXEC sp_GetCustomerOrders @customer_id = 1;
+
+EXEC sp_GetCustomerOrders @customer_id = 1, @start_date = '2017-01-01';
+
+```
+
+### Purpose and Benefits
+
+- **Performance:** Precompiled and cached execution plans
+- **Security:** Prevent SQL injection attacks
+- **Centralized Logic:** Business rules in one location
+- **Network Traffic:** Reduces data transfer
+- **Transaction Control:** Manage complex transactions
+
+### Real-World Use Cases
+
+1. **Order Processing:** Handle complete order workflow
+2. **Data Import:** Process and validate large data sets
+3. **Report Generation:** Complex analytical procedures
+4. **Maintenance Tasks:** Database cleanup and optimization
+
+---
+
+
+### When to Use Each Feature
+
+| Feature               | Best For                                    | Avoid When                 |
+| --------------------- | ------------------------------------------- | -------------------------- |
+| **Variables**         | Temporary storage, dynamic queries          | Simple static queries      |
+| **Flow Control**      | Complex logic, conditional operations       | Simple filtering           |
+| **Functions**         | Reusable calculations, data transformation  | Data modification          |
+| **Stored Procedures** | Complex business logic, multiple operations | Simple queries             |
+
+
+### Performance Considerations
+
+1. **Triggers** should be lightweight and fast
+2. **Functions** in WHERE clauses can hurt performance
+
+### Security Benefits
+
+- **Stored Procedures** prevent SQL injection
+- **Functions** centralize business logic
+- **Variables** make code less predictable to attackers
