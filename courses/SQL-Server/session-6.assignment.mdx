@@ -1,0 +1,105 @@
+### 1. Customer Spending Analysis
+
+Write a query that uses variables to find the total amount spent by customer ID 1. Display a message showing whether they are a VIP customer (spent > $5000) or regular customer.
+
+### 2. Product Price Threshold Report
+
+Create a query using variables to count how many products cost more than $1500. Store the threshold price in a variable and display both the threshold and count in a formatted message.
+
+### 3. Staff Performance Calculator
+
+Write a query that calculates the total sales for staff member ID 2 in the year 2017. Use variables to store the staff ID, year, and calculated total. Display the results with appropriate labels.
+
+### 4. Global Variables Information
+
+Create a query that displays the current server name, SQL Server version, and the number of rows affected by the last statement. Use appropriate global variables.
+
+### 5.Write a query that checks the inventory level for product ID 1 in store ID 1. Use IF statements to display different messages based on stock levels:
+
+- If quantity > 20: Well stocked
+- If quantity 10-20: Moderate stock
+- If quantity < 10: Low stock - reorder needed
+
+### 6.Create a WHILE loop that updates low-stock items (quantity < 5) in batches of 3 products at a time. Add 10 units to each product and display progress messages after each batch.
+
+### 7. Product Price Categorization
+
+Write a query that categorizes all products using CASE WHEN based on their list price:
+
+- Under $300: Budget
+- $300-$800: Mid-Range
+- $801-$2000: Premium
+- Over $2000: Luxury
+
+### 8. Customer Order Validation
+
+Create a query that checks if customer ID 5 exists in the database. If they exist, show their order count. If not, display an appropriate message.
+
+### 9. Shipping Cost Calculator Function
+
+Create a scalar function named CalculateShipping that takes an order total as input and returns shipping cost:
+
+- Orders over $100: Free shipping ($0)
+- Orders $50-$99: Reduced shipping ($5.99)
+- Orders under $50: Standard shipping ($12.99)
+
+### 10. Product Category Function
+
+Create an inline table-valued function named GetProductsByPriceRange that accepts minimum and maximum price parameters and returns all products within that price range with their brand and category information.
+
+### 11. Customer Sales Summary Function
+
+Create a multi-statement function named GetCustomerYearlySummary that takes a customer ID and returns a table with yearly sales data including total orders, total spent, and average order value for each year.
+
+### 12. Discount Calculation Function
+
+Write a scalar function named CalculateBulkDiscount that determines discount percentage based on quantity:
+
+- 1-2 items: 0% discount
+- 3-5 items: 5% discount
+- 6-9 items: 10% discount
+- 10+ items: 15% discount
+
+### 13. Customer Order History Procedure
+
+Create a stored procedure named sp_GetCustomerOrderHistory that accepts a customer ID and optional start/end dates. Return the customer's order history with order totals calculated.
+
+### 14. Inventory Restock Procedure
+
+Write a stored procedure named sp_RestockProduct with input parameters for store ID, product ID, and restock quantity. Include output parameters for old quantity, new quantity, and success status.
+
+### 15. Order Processing Procedure
+
+Create a stored procedure named sp_ProcessNewOrder that handles complete order creation with proper transaction control and error handling. Include parameters for customer ID, product ID, quantity, and store ID.
+
+### 16. Dynamic Product Search Procedure
+
+Write a stored procedure named sp_SearchProducts that builds dynamic SQL based on optional parameters: product name search term, category ID, minimum price, maximum price, and sort column.
+
+### 17. Staff Bonus Calculation System
+
+Create a complete solution that calculates quarterly bonuses for all staff members. Use variables to store date ranges and bonus rates. Apply different bonus percentages based on sales performance tiers.
+
+### 18. Smart Inventory Management
+
+Write a complex query with nested IF statements that manages inventory restocking. Check current stock levels and apply different reorder quantities based on product categories and current stock levels.
+
+### 19. Customer Loyalty Tier Assignment
+
+Create a comprehensive solution that assigns loyalty tiers to customers based on their total spending. Handle customers with no orders appropriately and use proper NULL checking.
+
+### 20. Product Lifecycle Management
+
+Write a stored procedure that handles product discontinuation including checking for pending orders, optional product replacement in existing orders, clearing inventory, and providing detailed status messages.
+
+---
+
+## Bonus Challenges
+
+### 21. Advanced Analytics Query
+
+Create a query that combines multiple advanced concepts to generate a comprehensive sales report showing monthly trends, staff performance, and product category analysis.
+
+### 22. Data Validation System
+
+Build a complete data validation system using functions and procedures that ensures data integrity when inserting new orders, including customer validation, inventory checking, and business rule enforcement.
