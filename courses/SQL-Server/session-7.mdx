@@ -270,7 +270,7 @@ ALTER TABLE department ENABLE TRIGGER tr_orders_audit
 
 ```sql
 CREATE TRIGGER tr100
-ON Course
+ON PRODUCT
 AFTER UPDATE
 AS
 	SELECT * FROM inserted
