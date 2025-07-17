@@ -1,0 +1,291 @@
+---
+title: Session 7 - Data Storage, Indexing, and Triggers
+tags:
+  - Data-Storage
+  - Indexing
+  - Triggers
+materialsUrl: https://github.com/KaEssam/Depi-Course-Material/tree/main/StoreDB%20-%20Database
+codeUrl: https://github.com/KaEssam/Depi-Course-Material/tree/main/1%20-%20SQL%20Server/6%20-%20Session%206
+---
+
+## Table of Contents
+
+1. [Data Storage](#data-storage)
+2. [Indexing](#indexing)
+3. [Triggers](#triggers)
+
+---
+
+## **Data Storage**
+
+### **How Data is Stored in SQL Server**
+
+### Database Files
+
+- **.MDF** – Primary Data File (holds tables, views, indexes).
+- **.NDF** – Optional secondary data files.
+- **.LDF** – Transaction log files (records every INSERT, UPDATE, DELETE).
+
+---
+
+### Pages and Extents
+
+- **Page = 8KB** → smallest unit of storage.
+- **Extent = 8 pages = 64KB** → allocation unit.
+- **Types of Extents**:
+  - _Uniform_: All 8 pages belong to one object.
+  - _Mixed_: Each page can belong to a different object.
+
+![SQL Server Page + Extent layout](/images/indexes/SQL%20Server%20Page%20+%20Extent%20layout%5D.png)
+
+---
+
+### Types of Pages
+
+| Page Type           | Purpose                                   |
+| ------------------- | ----------------------------------------- |
+| **Data Page**       | Holds table rows                          |
+| **Index Page**      | Holds index tree nodes                    |
+| **Text/Image Page** | Large data (e.g., `varchar(max)`, images) |
+| **IAM Page**        | Tracks which pages/extents belong to what |
+
+---
+
+## Indexing
+
+### Definition
+
+Indexes are database objects that improve query performance by creating optimized access paths to data. They work like a book's index, allowing the database engine to quickly locate specific rows.
+
+### Script to create Employees table to test Indexes
+
+```sql
+Create Table Employees
+(
+	Id int primary key identity,
+	Name nvarchar(50),
+	Department nvarchar(50)
+)
+Go
+
+SET NOCOUNT ON
+Declare @counter int = 1
+
+While(@counter <= 1000000)
+Begin
+	Declare @Name nvarchar(50) = 'ABC ' + RTRIM(@counter)
+	Declare @Dept nvarchar(10) = 'Dept ' + RTRIM(@counter)
+
+	Insert into Employees values (@Name, @Email, @Dept)
+
+	Set @counter = @counter +1
+
+	If(@Counter%100000 = 0)
+		Print RTRIM(@Counter) + ' rows inserted'
+End
+```
+
+### **Clustered Index:**
+
+- Physically orders table data
+- One per table (usually on primary key)
+- Leaf level contains actual data
+
+![Clustered index structure showing B-Tree with actual data in leaf](/images/indexes/Clustered%20index%20structure%20showing%20B-Tree%20with%20actual%20data%20in%20leaf.png)
+
+### How SQL Server finds a row by ID
+
+**we want to find Employee row with `EmployeeId = 1120`**
+
+![How SQL Server finds a row by ID](/images/indexes/How%20SQL%20Server%20finds%20a%20row%20by%20ID.jpg)
+
+### **Non-Clustered Index:**
+
+- Separate structure pointing to data
+- Multiple allowed per table
+- Leaf level contains pointers to data
+
+![Non-Clustered Index in SQL Server](/images/indexes/Non-Clustered%20Index%20in%20SQL%20Server.png)
+
+### How Indexes Work Internally (B-Tree)?
+
+- **Root Node** → Entry point
+- **Intermediate Nodes** → Guide search
+- **Leaf Nodes**:
+  - Clustered → actual rows
+  - Non-clustered → pointers to data
+
+### Non-clustered and clusterd index in action
+
+![Non-clustered and clusterd index in action](/images/indexes/Non-clustered%20and%20clusterd%20index%20in%20action.png)
+
+### Create Index
+
+**Syntax:**
+
+```sql
+-- Clustered Index
+CREATE CLUSTERED INDEX IX_indexname ON table_name (column1, column2);
+
+-- Non-Clustered Index
+CREATE NONCLUSTERED INDEX IX_indexname ON table_name (column1, column2)
+INCLUDE (column3, column4);
+```
+
+### Purpose and Benefits
+
+- **Performance:** Dramatically faster SELECT operations
+- **Uniqueness:** Enforce unique constraints
+- **Sorting:** Pre-sorted data for ORDER BY operations
+- **Joins:** Faster table joins
+
+### Real-World Use Cases
+
+1. **E-commerce:** Fast product searches by category or price
+2. **Customer Management:** Quick lookups by email or phone
+3. **Financial Systems:** Fast transaction history retrieval
+4. **Analytics:** Efficient date range queries
+
+### Examples
+
+```sql
+-- Index for frequently searched product names
+CREATE NONCLUSTERED INDEX IX_Products_ProductName
+ON production.products (product_name);
+
+-- Composite index for brand and category searches
+CREATE NONCLUSTERED INDEX IX_Products_Brand_Category
+ON production.products (brand_id, category_id)
+INCLUDE (product_name, list_price);
+
+-- Index for order date searches
+CREATE NONCLUSTERED INDEX IX_Orders_OrderDate
+ON sales.orders (order_date)
+INCLUDE (customer_id, order_status);
+```
+
+---
+
+## Triggers
+
+### Definition
+
+Triggers are special stored procedures that automatically execute (fire) in response to specific database events. They cannot be called directly and run automatically when their triggering event occurs.
+
+**What it does:** Automatically executes code in response to INSERT, UPDATE, DELETE, or DDL operations.
+
+**Syntax:**
+
+```sql
+CREATE TRIGGER trigger_name
+ON table_name
+FOR/AFTER/INSTEAD OF [INSERT, UPDATE, DELETE]
+AS
+BEGIN
+    -- Trigger logic
+    -- Access to INSERTED and DELETED virtual tables
+END;
+```
+
+### Purpose and Benefits
+
+- **Data Integrity:** Enforce complex business rules
+- **Auditing:** Track data changes automatically
+- **Automation:** Perform related operations automatically
+- **Security:** Log access and modifications
+- **Synchronization:** Keep related tables in sync
+
+### Real-World Use Cases
+
+1. **Audit Trails:** Track who changed what and when
+2. **Inventory Management:** Auto-update stock levels
+3. **Business Rules:** Enforce complex constraints
+4. **Notifications:** Send alerts on data changes
+5. **Data Warehouse:** Update derived/calculated fields
+
+**Audit Trigger Example:**
+
+```sql
+-- Create audit table
+CREATE TABLE sales.order_audit (
+    audit_id INT IDENTITY(1,1) PRIMARY KEY,
+    order_id INT,
+    action_type VARCHAR(10), -- INSERT, UPDATE, DELETE
+    old_status TINYINT,
+    new_status TINYINT,
+    changed_by VARCHAR(100),
+    change_date DATETIME DEFAULT GETDATE()
+);
+
+-- Create trigger to audit order status changes
+CREATE TRIGGER tr_orders_audit
+ON sales.orders
+FOR UPDATE
+AS
+BEGIN
+    IF UPDATE(order_status)
+    BEGIN
+        INSERT INTO sales.order_audit (order_id, action_type, old_status, new_status, changed_by)
+        SELECT
+            i.order_id,
+            'UPDATE',
+            d.order_status,
+            i.order_status,
+            SYSTEM_USER
+        FROM INSERTED i
+        INNER JOIN DELETED d ON i.order_id = d.order_id
+        WHERE i.order_status != d.order_status;
+    END
+END;
+
+-- Test the trigger
+UPDATE sales.orders
+SET order_status = 4 -- Completed
+WHERE order_id = 1615;
+
+-- Check audit trail
+SELECT * FROM sales.order_audit;
+
+-- Enable and Disable Trigger
+ALTER TABLE department DISABLE TRIGGER tr_orders_audit
+ALTER TABLE department ENABLE TRIGGER tr_orders_audit
+```
+
+---
+
+### Types of Triggers
+
+**DML Triggers:**
+
+- **FOR/AFTER:** Execute after the triggering event
+- **INSTEAD OF:** Replace the triggering event (mainly for views)
+
+**DDL Triggers:**
+
+- Fire on schema changes (CREATE, ALTER, DROP)
+
+### Virtual Tables
+
+**INSERTED:** Contains new row values (INSERT, UPDATE)
+**DELETED:** Contains old row values (DELETE, UPDATE)
+
+```sql
+CREATE TRIGGER tr100
+ON Course
+AFTER UPDATE
+AS
+	SELECT * FROM inserted
+	SELECT * FROM deleted
+```
+
+---
+
+## Stored procedures vs Triggers
+
+| Sr. No. | Key                    | Triggers                                                                                             | Stored procedures                                                                                                    |
+| ------- | ---------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 1       | Basic                  | trigger is a stored procedure that runs automatically when events happen (eg update, insert, delete) | Stored procedures are a pieces of the code to do some specific task                                                  |
+| 2       | Running                | It can execute automatically based on the events                                                     | It can be invoked explicitly by the user                                                                             |
+| 3       | Parameter              | It can not take input as parameter                                                                   | It can take input as a parameter                                                                                     |
+| 4       | Transaction statements | we can't use transaction statements inside a trigger                                                 | We can use transaction statements like begin transaction, commit transaction, and rollback inside a stored procedure |
+| 5       | Return                 | Triggers can not return values                                                                       | Stored procedures can return values                                                                                  |
