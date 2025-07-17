@@ -62,6 +62,48 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
         }`}
       >
         <div className="bg-surface-hover/30">
+          {/* Quick Access Buttons */}
+          {(course.specialFiles?.project || 
+            course.specialFiles?.resources || 
+            course.specialFiles?.practiceAll) && (
+            <div className="p-3 sm:p-4 border-b border-border/20">
+              <div className="flex gap-2 justify-center">
+                {/* Project Button */}
+                {course.specialFiles?.project && (
+                  <a
+                    href={`/courses/${course.slug}/project`}
+                    className="flex flex-col items-center p-3 bg-blue-600/10 border border-blue-500/30 rounded-lg hover:bg-blue-600/20 hover:border-blue-500/50 transition-all duration-200 text-center group"
+                  >
+                    <FileText className="w-5 h-5 text-blue-400 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-medium text-blue-400">Project</span>
+                  </a>
+                )}
+
+                {/* Resources Button */}
+                {course.specialFiles?.resources && (
+                  <a
+                    href={`/courses/${course.slug}/resources`}
+                    className="flex flex-col items-center p-3 bg-green-600/10 border border-green-500/30 rounded-lg hover:bg-green-600/20 hover:border-green-500/50 transition-all duration-200 text-center group"
+                  >
+                    <BookOpen className="w-5 h-5 text-green-400 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-medium text-green-400">Resources</span>
+                  </a>
+                )}
+
+                {/* Practice All Button */}
+                {course.specialFiles?.practiceAll && (
+                  <a
+                    href={`/courses/${course.slug}/practice-all`}
+                    className="flex flex-col items-center p-3 bg-purple-600/10 border border-purple-500/30 rounded-lg hover:bg-purple-600/20 hover:border-purple-500/50 transition-all duration-200 text-center group"
+                  >
+                    <Zap className="w-5 h-5 text-purple-400 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-medium text-purple-400">Practice All</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
           {course.lectures.length === 0 ? (
             <div className="responsive-padding text-center responsive-spacing-sm">
               <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-xl bg-surface border border-border mx-auto flex items-center justify-center shadow-soft">

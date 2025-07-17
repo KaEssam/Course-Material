@@ -8,6 +8,11 @@ export interface Course {
   description?: string
   lectures: Lecture[]
   visible?: boolean
+  specialFiles?: {
+    project?: boolean
+    resources?: boolean
+    practiceAll?: boolean
+  }
 }
 
 export interface Lecture {
@@ -55,7 +60,12 @@ export function getAllCourses(respectVisibility: boolean = false): Course[] {
       title: courseTitle,
       description: courseDescription,
       lectures,
-      visible: courseVisible
+      visible: courseVisible,
+      specialFiles: {
+        project: isSpecialFileVisible(courseSlug, 'project.mdx'),
+        resources: isSpecialFileVisible(courseSlug, 'resources.mdx'),
+        practiceAll: isSpecialFileVisible(courseSlug, 'practice-all.mdx')
+      }
     }
   }).filter(course => course.lectures.length > 0)
 
@@ -75,7 +85,13 @@ export function getLecturesForCourse(courseSlug: string, respectVisibility: bool
   }
 
   const files = fs.readdirSync(courseDir)
-    .filter(name => name.endsWith('.mdx') && !name.endsWith('.assignment.mdx') && !name.endsWith('.practice.mdx') && !name.startsWith('_'))
+    .filter(name => name.endsWith('.mdx') 
+      && !name.endsWith('.assignment.mdx') 
+      && !name.endsWith('.practice.mdx') 
+      && !name.startsWith('_')
+      && name !== 'project.mdx'
+      && name !== 'practice-all.mdx'
+      && name !== 'resources.mdx')
 
   let lectures = files.map(fileName => {
     const lectureSlug = fileName.replace('.mdx', '')
@@ -259,4 +275,17 @@ function formatTitle(slug: string): string {
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
+}
+
+export function isSpecialFileVisible(courseSlug: string, fileName: string): boolean {
+  const filePath = path.join(coursesDirectory, courseSlug, fileName)
+  
+  if (!fs.existsSync(filePath)) {
+    return false
+  }
+
+  const fileContents = fs.readFileSync(filePath, 'utf8')
+  const { data } = matter(fileContents)
+  
+  return data.visible !== false
 }

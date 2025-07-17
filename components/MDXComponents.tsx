@@ -9,6 +9,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 // Dynamically import Mermaid to avoid SSR issues
 const MermaidDiagram = dynamic(() => import('./MermaidDiagram'), { ssr: false })
+const SimpleDropdown = dynamic(() => import('./SimpleDropdown'), { ssr: false })
 
 interface CodeBlockProps {
   children: string
@@ -192,4 +193,5 @@ export const mdxComponents = {
       {children}
     </a>
   ),
+  SimpleDropdown,
 }
