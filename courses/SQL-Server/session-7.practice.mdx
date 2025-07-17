@@ -1,0 +1,94 @@
+# SQL Server Project Requirements Sheet
+
+## Project Title: **Examination System Database**
+
+---
+
+## System Requirements
+
+- ✅ System should provide a question pool, so instructors can pick an exam from it.
+- ✅ Question types may be:
+  - Multiple Choice
+  - True/False
+  - Text questions
+- ✅ For multiple choice and true/false:
+  - Store correct answer.
+  - Automatically check student answers and store results.
+- ✅ For text questions:
+  - Store the best accepted answer.
+  - Use text functions and regular expressions to check student answers.
+  - Display valid/invalid answers to the instructor for manual review and marking. (**Bonus**)
+- ✅ Store:
+  - **Courses** (Course name, description, Max degree, Min degree)
+  - **Instructors**
+  - **Students**
+- ✅ Each instructor can teach one or more courses.
+- ✅ Each course is assigned to one instructor per class (Instructor may differ across years/classes).
+- ✅ **Training Manager** can:
+  - Add/edit Branches
+  - Add/edit Tracks (within each department)
+  - Add new intakes
+- ✅ Training Manager can:
+  - Add students
+  - Define their personal data, intake, branch, and track
+- ✅ System users (Training Manager, Instructors, Students) must have login accounts.
+- ✅ Instructor can create exams (for their own courses only):
+  - Select question count by type (auto-random or manual selection)
+  - Assign degrees to each question (total must not exceed course's max degree)
+  - One course may have multiple exams
+- ✅ For each exam, system must store:
+  - Type (Exam/Corrective)
+  - Intake, Branch, Track, Course
+  - Start Time, End Time, Total Duration, Allowance Options
+- ✅ Exams are stored with info: Year, Course, Instructor
+- ✅ Instructors can:
+  - Assign exams to specific students
+  - Define exam date and time window
+  - Students can only access exams during the specified time
+- ✅ System should:
+  - Store student answers
+  - Calculate correct answers
+  - Calculate final result per student per course
+- ✅ Insert **test data** in all tables and **test** the system
+
+---
+
+## Technical Requirements
+
+- ✅ Implement database using **files and filegroups** (based on data size estimation)
+- ✅ Choose the right **datatype** for each column
+- ✅ Apply **naming conventions** for all DB objects
+- ✅ Implement **Indexes** for performance
+- ✅ Use **Constraints** and **Triggers** to ensure:
+  - Data integrity
+  - User access rules
+- ✅ Use **Stored Procedures** and **Functions** to handle all system logic
+- ✅ Use **Views** to present results (users should not write raw queries)
+- ✅ Provide **search/display options** for users with flexible criteria
+- ✅ Define 4 user accounts:
+  - Admin (admin tasks only)
+  - Training Manager
+  - Instructor
+  - Student
+- ✅ Each user account should:
+  - Access only related objects/tasks
+  - Have specific **SQL user permissions**
+- ✅ Implement **automatic daily backup**
+
+---
+
+## Project Deliveries
+
+- **System Requirements Sheet**
+- **ERD Diagram** (Image or Word)
+- **Database Files**
+- **SQL Server Solution** including:
+- One script per team member (individual work)
+- One script for full DB structure, objects, and data
+- **Text file** with names and brief descriptions of all DB objects:
+- Views, Procedures, Functions, Triggers, etc.
+- **Test Sheet** containing:
+- Test queries
+- Results
+- Comments
+- **Accounts File** (Text file with DB accounts and passwords)
