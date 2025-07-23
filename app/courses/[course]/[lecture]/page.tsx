@@ -56,7 +56,7 @@ export default function LecturePage({ params }: LecturePageProps) {
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
           <Link
-            href={`/slides/${course}/${lecture}`}
+            href={`/slides/${encodeURIComponent(course)}/${lecture}`}
             className="btn btn-ghost btn-responsive-sm hover:bg-orange/5 hover:text-orange border-orange/20 shadow-soft hover:shadow-medium"
           >
             <Presentation className="w-3.5 h-3.5 mr-1.5" />
@@ -65,7 +65,7 @@ export default function LecturePage({ params }: LecturePageProps) {
 
           {lectureData.hasAssignment && (
             <Link
-              href={`/assignments/${course}/${lecture}`}
+              href={`/assignments/${encodeURIComponent(course)}/${lecture}`}
               className="btn btn-ghost btn-responsive-sm hover:bg-yellow/5 hover:text-yellow border-yellow/20 shadow-soft hover:shadow-medium"
             >
               <Clipboard className="w-3.5 h-3.5 mr-1.5" />
@@ -75,7 +75,7 @@ export default function LecturePage({ params }: LecturePageProps) {
 
           {lectureData.hasPractice && (
             <Link
-              href={`/practices/${course}/${lecture}`}
+              href={`/practices/${encodeURIComponent(course)}/${lecture}`}
               className="btn btn-ghost btn-responsive-sm hover:bg-green/5 hover:text-green border-green/20 shadow-soft hover:shadow-medium"
             >
               <Zap className="w-3.5 h-3.5 mr-1.5" />
@@ -160,7 +160,7 @@ export default function LecturePage({ params }: LecturePageProps) {
           <div className="flex gap-4">
             {lectureData.hasAssignment && (
               <Link
-                href={`/assignments/${course}/${lecture}`}
+                href={`/assignments/${encodeURIComponent(course)}/${lecture}`}
                 className="transition-colors text-yellow hover:text-yellow/80"
               >
                 Assignment →
@@ -169,7 +169,7 @@ export default function LecturePage({ params }: LecturePageProps) {
 
             {lectureData.hasPractice && (
               <Link
-                href={`/practices/${course}/${lecture}`}
+                href={`/practices/${encodeURIComponent(course)}/${lecture}`}
                 className="transition-colors text-green hover:text-green/80"
               >
                 Practice →
@@ -178,7 +178,7 @@ export default function LecturePage({ params }: LecturePageProps) {
 
             {nextLecture && (
               <Link
-                href={`/courses/${course}/${nextLecture.slug}`}
+                href={`/courses/${encodeURIComponent(course)}/${nextLecture.slug}`}
                 className="transition-colors text-blue hover:text-blue/80"
               >
                 Next: {nextLecture.title} →

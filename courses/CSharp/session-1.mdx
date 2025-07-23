@@ -1,0 +1,243 @@
+---
+title: 'Session 1 - Intro to Programming'
+tags: ['Programming Paradigms', 'Pre Dot Net', 'Dot Net']
+codeUrl: 'https://github.com/KaEssam/Depi-Course-Material/tree/main/2%20-%20C%23/1%20-%20Session%201'
+---
+
+## Programming Paradigms
+
+### 1-Linear / Sequential
+
+This is the **simplest** form of programming.
+
+> Think of it like **following a recipe** step by step, from top to bottom, **without skipping or branching**.
+
+#### Flow of Execution:
+
+`Step 1 → Step 2 → Step 3 → Step 4 → End`
+
+### 2- Structured
+
+This paradigm introduces **structure, logic, and control**.
+
+> Imagine a **flowchart with branches and loops** — you can now decide and repeat.
+
+#### Flow of Execution:
+
+`Step 1 → if condition → (Yes → A) / (No → B) → Repeat if needed → End`
+
+### 3- Object-Oriented Programming (OOP)
+
+This paradigm organizes the program as **"objects"** — each object contains both **data** and **behavior**.
+
+> Imagine building a **real-world system** using blocks — each block (object) represents a real item, like a car, student, or bank account.
+
+---
+
+## Pre Dot Net
+
+**Problems Pre-.NET:**
+
+- No unified runtime.
+- Difficult memory and error handling.
+- Language-specific and platform-bound (mostly Windows).
+- No garbage collection or true multi-language support.
+
+![Screenshot 2025-07-23 151447.png](/images/csharp/Screenshot%202025-07-23%20151447.png)
+
+---
+
+## Dot Net Framework
+
+Covers **.NET Framework**, the original Microsoft platform released in early 2000s.
+
+**Key Components:**
+
+1.**CLR (Common Language Runtime):**
+
+- The virtual machine that runs .NET apps.
+- Handles memory, exceptions, garbage collection, security.
+
+2.**BCL (Base Class Library):**
+
+- Set of reusable libraries for file I/O, networking, collections, etc.
+
+3.**Languages (C#, VB.NET, F#):**
+
+- All compile into **IL (Intermediate Language)** and run on CLR.
+
+4.**ASP.NET (Web Forms, MVC):**
+
+- Tools for building dynamic web apps.
+
+5.**WinForms/WPF:**
+
+- GUI tools for building desktop applications.
+
+6.**ADO.NET:**
+
+- Library for accessing databases.
+
+**Architecture Diagram:**
+
+![.NET Framework Architecture](/images/csharp/Screenshot%202025-07-23%20151923.png)
+
+_The .NET Framework provides a unified platform where multiple languages compile to IL and run on the CLR._
+
+---
+
+## Dot Net Core
+
+1. **Cross-Platform (Windows, Linux, macOS):**
+2. **Open Source:**
+3. **Modular and Lightweight:**
+4. **High Performance (Kestrel server):**
+5. **Command-Line Interface (CLI):**
+6. **Modern ASP.NET Core:**
+7. **Self-Contained Deployments:**
+
+---
+
+## Solution
+
+A container for one or more related projects (UI, API, services).
+
+### Namespace & Main Method
+
+```cs
+
+namespace Project
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // code blocks...
+        }
+    }
+}
+```
+
+The `namespace` groups your class logically.
+
+The `Main` method is the entry point of the application.
+
+`internal` class Program: the container for your logic.
+
+---
+
+### Console Setup
+
+```cs
+Console.Title = "C# Day1";
+Console.BackgroundColor = ConsoleColor.DarkCyan;
+Console.ForegroundColor = ConsoleColor.Black;
+Console.WriteLine("Hello, World!");
+Console.ResetColor();
+```
+
+#### Explanation:
+
+- `Console.Title`: sets the title of the console window.
+- `Console.BackgroundColor` & `Console.ForegroundColor`: change color.
+- `Console.WriteLine()`: prints text to the console.
+- `Console.ResetColor()`: resets to default colors.
+
+---
+
+### Naming & Declaration
+
+```cs
+int x = 5;
+int @int = 5;      // legal but discouraged
+int num1 = 5;
+string Y = "ahmed";
+```
+
+Rules:
+
+- Variable names should be camelCase.
+- Avoid using reserved keywords like int, even with @.
+- Declare variables with clear, descriptive names.
+
+---
+
+## Data Types
+
+### Value Types
+
+`int, double, long, float, decimal, uint, ulong`
+
+### Size in Memory:
+
+```cs
+Console.WriteLine(sizeof(int));      // 4 bytes Console.WriteLine(sizeof(long));     // 8 bytes Console.WriteLine(sizeof(double));   // 8 bytes Console.WriteLine(sizeof(decimal));  // 16 bytes
+```
+
+### Min/Max Values:
+
+```cs
+Console.WriteLine(int.MinValue);
+Console.WriteLine(int.MaxValue);
+Console.WriteLine(double.MinValue); console.WriteLine(double.MaxValue);
+```
+
+Useful for performance decisions, memory usage, and understanding precision.
+
+---
+
+### Strings
+
+```cs
+string FirstName = "Karim";
+string LastName = "Essam";
+string fullName = FirstName + ' ' + LastName;
+string FullName = $"{FirstName} {LastName}";
+```
+
+### String Methods:
+
+```cs
+Console.WriteLine(FullName.ToUpper());           // "KARIM ESSAM"
+Console.WriteLine(FullName.ToLower());           // "karim essam"
+Console.WriteLine(FullName.Length);              // number of characters
+Console.WriteLine(FullName.Contains("A"));       // true/false
+Console.WriteLine(FullName.IndexOf('A'));        // position
+Console.WriteLine(FullName.Replace("Karim", "Ali")); // "Ali Essam"
+
+```
+
+---
+
+## User Input
+
+### 1. `ReadLine()`– For Full String Input:
+
+```cs
+Console.Write("Enter Your Name: ");
+string userName = Console.ReadLine();
+
+Console.Write("Enter Your Age: ");
+int age = Convert.ToInt32(Console.ReadLine());
+
+Console.WriteLine($"Your name is {userName}, age {age}");
+
+```
+
+### 2. `Read**()` – For Single Character Input:
+
+```cs
+Console.Write("Enter key: ");
+char k1 = (char)Console.Read(); // Reads one character
+Console.ReadLine(); // To consume enter key
+
+char k2 = Convert.ToChar(Console.Read()); // Another char
+Console.ReadLine(); // Consume line
+
+int k3 = Console.Read(); // ASCII value
+
+Console.WriteLine($"k1: {k1}"); // character
+Console.WriteLine($"k2: {k2}");
+Console.WriteLine($"k3: {k3}"); // ASCII number
+
+```

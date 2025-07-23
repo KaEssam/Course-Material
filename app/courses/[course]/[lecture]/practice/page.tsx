@@ -24,7 +24,7 @@ export default function PracticePage({ params }: PracticePageProps) {
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <Link
-          href={`/courses/${course}/${lecture}`}
+          href={`/courses/${encodeURIComponent(course)}/${lecture}`}
           className="flex items-center gap-2 text-muted hover:text-text transition-colors"
         >
           <ArrowLeft size={16} />

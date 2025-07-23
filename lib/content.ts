@@ -8,6 +8,8 @@ export interface Course {
   description?: string
   lectures: Lecture[]
   visible?: boolean
+  preview?: boolean
+  order?: number
   specialFiles?: {
     project?: boolean
     resources?: boolean
@@ -46,6 +48,8 @@ export function getAllCourses(respectVisibility: boolean = false): Course[] {
     let courseVisible = true
     let courseTitle = formatTitle(courseSlug) // Default fallback
     let courseDescription
+    let coursePreview = false
+    let courseOrder: number | undefined
 
     if (fs.existsSync(courseConfigPath)) {
       const courseConfigContents = fs.readFileSync(courseConfigPath, 'utf8')
@@ -53,6 +57,8 @@ export function getAllCourses(respectVisibility: boolean = false): Course[] {
       courseVisible = data.visible !== false
       courseTitle = data.title || courseTitle // Use title from _course.mdx if available
       courseDescription = data.description
+      coursePreview = data.preview === true
+      courseOrder = typeof data.order === 'number' ? data.order : undefined
     }
 
     return {
@@ -61,6 +67,8 @@ export function getAllCourses(respectVisibility: boolean = false): Course[] {
       description: courseDescription,
       lectures,
       visible: courseVisible,
+      preview: coursePreview,
+      order: courseOrder,
       specialFiles: {
         project: isSpecialFileVisible(courseSlug, 'project.mdx'),
         resources: isSpecialFileVisible(courseSlug, 'resources.mdx'),
@@ -68,6 +76,23 @@ export function getAllCourses(respectVisibility: boolean = false): Course[] {
       }
     }
   }).filter(course => course.lectures.length > 0)
+
+  // Sort courses by order (courses with order come first, then by order number, then alphabetically)
+  courses.sort((a, b) => {
+    // If both have order, sort by order number
+    if (a.order !== undefined && b.order !== undefined) {
+      return a.order - b.order
+    }
+    // If only one has order, it comes first
+    if (a.order !== undefined && b.order === undefined) {
+      return -1
+    }
+    if (a.order === undefined && b.order !== undefined) {
+      return 1
+    }
+    // If neither has order, sort alphabetically by title
+    return a.title.localeCompare(b.title)
+  })
 
   // Filter courses based on visibility
   if (respectVisibility) {
@@ -78,7 +103,9 @@ export function getAllCourses(respectVisibility: boolean = false): Course[] {
 }
 
 export function getLecturesForCourse(courseSlug: string, respectVisibility: boolean = false): Lecture[] {
-  const courseDir = path.join(coursesDirectory, courseSlug)
+  // Decode URL-encoded course slug (e.g., C%23 -> C#)
+  const decodedCourseSlug = decodeURIComponent(courseSlug)
+  const courseDir = path.join(coursesDirectory, decodedCourseSlug)
 
   if (!fs.existsSync(courseDir)) {
     return []
@@ -161,7 +188,9 @@ export function getLecturesForCourse(courseSlug: string, respectVisibility: bool
 }
 
 export function getLecture(courseSlug: string, lectureSlug: string): Lecture | null {
-  const filePath = path.join(coursesDirectory, courseSlug, `${lectureSlug}.mdx`)
+  // Decode URL-encoded course slug (e.g., C%23 -> C#)
+  const decodedCourseSlug = decodeURIComponent(courseSlug)
+  const filePath = path.join(coursesDirectory, decodedCourseSlug, `${lectureSlug}.mdx`)
 
   if (!fs.existsSync(filePath)) {
     return null
@@ -171,11 +200,11 @@ export function getLecture(courseSlug: string, lectureSlug: string): Lecture | n
   const { data, content } = matter(fileContents)
 
   // Check for assignment file
-  const assignmentPath = path.join(coursesDirectory, courseSlug, `${lectureSlug}.assignment.mdx`)
+  const assignmentPath = path.join(coursesDirectory, decodedCourseSlug, `${lectureSlug}.assignment.mdx`)
   const hasAssignment = fs.existsSync(assignmentPath)
 
   // Check for practice file
-  const practicePath = path.join(coursesDirectory, courseSlug, `${lectureSlug}.practice.mdx`)
+  const practicePath = path.join(coursesDirectory, decodedCourseSlug, `${lectureSlug}.practice.mdx`)
   const hasPractice = fs.existsSync(practicePath)
 
   return {
@@ -191,7 +220,9 @@ export function getLecture(courseSlug: string, lectureSlug: string): Lecture | n
 }
 
 export function getAssignment(courseSlug: string, lectureSlug: string): Lecture | null {
-  const filePath = path.join(coursesDirectory, courseSlug, `${lectureSlug}.assignment.mdx`)
+  // Decode URL-encoded course slug (e.g., C%23 -> C#)
+  const decodedCourseSlug = decodeURIComponent(courseSlug)
+  const filePath = path.join(coursesDirectory, decodedCourseSlug, `${lectureSlug}.assignment.mdx`)
 
   if (!fs.existsSync(filePath)) {
     return null
@@ -213,7 +244,9 @@ export function getAssignment(courseSlug: string, lectureSlug: string): Lecture 
 }
 
 export function getPractice(courseSlug: string, lectureSlug: string): Lecture | null {
-  const filePath = path.join(coursesDirectory, courseSlug, `${lectureSlug}.practice.mdx`)
+  // Decode URL-encoded course slug (e.g., C%23 -> C#)
+  const decodedCourseSlug = decodeURIComponent(courseSlug)
+  const filePath = path.join(coursesDirectory, decodedCourseSlug, `${lectureSlug}.practice.mdx`)
 
   if (!fs.existsSync(filePath)) {
     return null
@@ -278,7 +311,9 @@ function formatTitle(slug: string): string {
 }
 
 export function isSpecialFileVisible(courseSlug: string, fileName: string): boolean {
-  const filePath = path.join(coursesDirectory, courseSlug, fileName)
+  // Decode URL-encoded course slug (e.g., C%23 -> C#)
+  const decodedCourseSlug = decodeURIComponent(courseSlug)
+  const filePath = path.join(coursesDirectory, decodedCourseSlug, fileName)
   
   if (!fs.existsSync(filePath)) {
     return false

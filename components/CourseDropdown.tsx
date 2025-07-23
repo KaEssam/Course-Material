@@ -14,9 +14,10 @@ interface CourseDropdownProps {
   course: Course & {
     lectures: LectureWithMaterials[]
   }
+  displayNumber?: number
 }
 
-export default function CourseDropdown({ course }: CourseDropdownProps) {
+export default function CourseDropdown({ course, displayNumber }: CourseDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -27,9 +28,25 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
       >
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 md:gap-4">
-            <h3 className="font-semibold text-responsive-lg text-text-primary group-hover:text-orange transition-colors truncate">
-              {course.title}
-            </h3>
+            <div className="flex items-center gap-3">
+              {displayNumber && (
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-orange/10 border border-orange/20 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-bold text-orange">
+                    {displayNumber}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-responsive-lg text-text-primary group-hover:text-orange transition-colors truncate">
+                  {course.title}
+                </h3>
+                {course.preview && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-orange/10 text-orange border border-orange/20 flex-shrink-0">
+                    Preview
+                  </span>
+                )}
+              </div>
+            </div>
             <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 text-xs">
               <span className="flex items-center gap-1 sm:gap-1.5 bg-surface/80 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md border border-border/30 text-text-secondary group-hover/header:border-orange/20 group-hover/header:text-orange/80 transition-colors">
                 <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
@@ -71,7 +88,7 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
                 {/* Project Button */}
                 {course.specialFiles?.project && (
                   <a
-                    href={`/courses/${course.slug}/project`}
+                    href={`/courses/${encodeURIComponent(course.slug)}/project`}
                     className="flex flex-col items-center p-3 bg-blue-600/10 border border-blue-500/30 rounded-lg hover:bg-blue-600/20 hover:border-blue-500/50 transition-all duration-200 text-center group"
                   >
                     <FileText className="w-5 h-5 text-blue-400 mb-1 group-hover:scale-110 transition-transform" />
@@ -82,7 +99,7 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
                 {/* Resources Button */}
                 {course.specialFiles?.resources && (
                   <a
-                    href={`/courses/${course.slug}/resources`}
+                    href={`/courses/${encodeURIComponent(course.slug)}/resources`}
                     className="flex flex-col items-center p-3 bg-green-600/10 border border-green-500/30 rounded-lg hover:bg-green-600/20 hover:border-green-500/50 transition-all duration-200 text-center group"
                   >
                     <BookOpen className="w-5 h-5 text-green-400 mb-1 group-hover:scale-110 transition-transform" />
@@ -93,7 +110,7 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
                 {/* Practice All Button */}
                 {course.specialFiles?.practiceAll && (
                   <a
-                    href={`/courses/${course.slug}/practice-all`}
+                    href={`/courses/${encodeURIComponent(course.slug)}/practice-all`}
                     className="flex flex-col items-center p-3 bg-purple-600/10 border border-purple-500/30 rounded-lg hover:bg-purple-600/20 hover:border-purple-500/50 transition-all duration-200 text-center group"
                   >
                     <Zap className="w-5 h-5 text-purple-400 mb-1 group-hover:scale-110 transition-transform" />
@@ -119,7 +136,7 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
                     <div className="p-2 sm:p-3 md:p-4">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <Link
-                          href={`/courses/${course.slug}/${lecture.slug}`}
+                          href={`/courses/${encodeURIComponent(course.slug)}/${lecture.slug}`}
                           className="flex-1 group/link min-w-0"
                         >
                           <div className="flex items-start space-x-2 sm:space-x-3">
@@ -157,7 +174,7 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
                         <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 transition-all duration-200">
                           {lecture.hasAssignment && lecture.assignmentVisible !== false && (
                             <Link
-                              href={`/courses/${course.slug}/${lecture.slug}/assignment`}
+                              href={`/courses/${encodeURIComponent(course.slug)}/${lecture.slug}/assignment`}
                               className="btn btn-ghost btn-responsive-sm hover:bg-yellow/5 hover:text-yellow border-yellow/20 shadow-soft hover:shadow-medium mobile-friendly"
                               title="Assignment available"
                             >
@@ -169,7 +186,7 @@ export default function CourseDropdown({ course }: CourseDropdownProps) {
 
                           {lecture.hasPractice && lecture.practiceVisible !== false && (
                             <Link
-                              href={`/courses/${course.slug}/${lecture.slug}/practice`}
+                              href={`/courses/${encodeURIComponent(course.slug)}/${lecture.slug}/practice`}
                               className="btn btn-ghost btn-responsive-sm hover:bg-green/5 hover:text-green border-green/20 shadow-soft hover:shadow-medium mobile-friendly"
                               title="Practice exercises available"
                             >

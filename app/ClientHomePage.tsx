@@ -28,6 +28,19 @@ interface ClientHomePageProps {
 }
 
 export default function ClientHomePage({ courses }: ClientHomePageProps) {
+  // Separate courses into regular and preview
+  const regularCourses = courses.filter(course => !course.preview)
+  const previewCourses = courses.filter(course => course.preview)
+
+  // Function to get display number for a course
+  const getCourseDisplayNumber = (course: CourseWithMaterials, allCourses: CourseWithMaterials[]) => {
+    if (course.order !== undefined) {
+      return course.order
+    }
+    // If no order specified, use position in sorted list + 1
+    return allCourses.findIndex(c => c.slug === course.slug) + 1
+  }
+
   return (
     <div className="responsive-spacing-md zoom-container">
       {/* Header with Course Info */}
@@ -64,16 +77,53 @@ export default function ClientHomePage({ courses }: ClientHomePageProps) {
           </div>
         </div>
       ) : (
-        <div className="px-1 responsive-spacing-sm sm:px-2">
-          {courses.map((course, index) => (
-            <div
-              key={course.slug}
-              className="slide-up"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <CourseDropdown course={course} />
+        <div className="px-1 responsive-spacing-sm sm:px-2 space-y-8">
+          {/* Regular Courses */}
+          {regularCourses.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold text-text-primary mb-4 px-2">Courses</h2>
+              <div className="space-y-4">
+                {regularCourses.map((course, index) => (
+                  <div
+                    key={course.slug}
+                    className="slide-up"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <CourseDropdown 
+                      course={course} 
+                      displayNumber={getCourseDisplayNumber(course, courses)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          )}
+
+          {/* Preview Courses */}
+          {previewCourses.length > 0 && (
+            <div>
+              <div className="flex items-center gap-3 mb-4 px-2">
+                <h2 className="text-xl font-semibold text-text-primary">Preview Courses</h2>
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange/10 text-orange border border-orange/20">
+                  Coming Soon
+                </span>
+              </div>
+              <div className="space-y-4">
+                {previewCourses.map((course, index) => (
+                  <div
+                    key={course.slug}
+                    className="slide-up opacity-75"
+                    style={{ animationDelay: `${(regularCourses.length + index) * 100}ms` }}
+                  >
+                    <CourseDropdown 
+                      course={course} 
+                      displayNumber={getCourseDisplayNumber(course, courses)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
