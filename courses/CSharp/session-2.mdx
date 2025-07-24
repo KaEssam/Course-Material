@@ -1,0 +1,608 @@
+---
+title: 'Session 2 - C# Fundamentals'
+tags:
+  ['Type Casting', 'Operators', 'Control Flow', 'Loops', 'Arrays', 'Methods']
+visible: false
+codeUrl: 'https://github.com/KaEssam/Depi-Course-Material/tree/main/2%20-%20C%23/1%20-%20Session%201'
+---
+
+1. Recap
+2. Introduction to Data Types & Variables
+3. Value Types vs Reference Types
+4. Boxing & Unboxing
+5. Type Casting (Implicit, Explicit, Parse, Convert)
+6. Operators
+7. Conditional Logic (`if`, `else`, `switch`, ternary)
+8. Loops (`for`, `foreach`, `while`, `do-while`, `break`, `continue`)
+9. Arrays
+10. Methods
+
+---
+
+## Recap
+
+#### **Basic Structure of a C# Program**
+
+Let's look at the "Hello, World!" program. It contains the essential elements of any C# console application.
+
+```cs
+//Imports a namespace for core functionality (like the Console)
+using System;
+
+//A container to organize your code
+namespace HelloWorldApp
+{
+    //A container for methods and variables
+    class Program
+    {
+        //The entry point of the program. Execution starts here.
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}
+```
+
+- **`using` directive:** Tells the compiler we want to use types from a specific `namespace`. `System` is the most fundamental one.
+- **`namespace`:** A way to organize and prevent naming conflicts in your code.
+- **`class`:** A blueprint for creating objects. For now, think of it as a container for your code.
+- **`Main` method:** The special method where every C# console application begins.
+
+---
+
+## Data Types & Variables
+
+A **variable** is a named storage location in memory. You must declare a variable's **type** before you can use it. The type tells the compiler how much memory to allocate and what kind of data it can hold.
+
+### Primitive vs Non-Primitive Data Types
+
+| Feature    | Primitive Data Types                      | Non-Primitive (Reference) Data Types                      |
+| ---------- | ----------------------------------------- | --------------------------------------------------------- |
+| Definition | Basic data types provided by the language | Complex types built using primitives or custom structures |
+| Stored in  | Stack memory                              | Heap memory (reference stored in stack)                   |
+| Examples   | `int`, `float`, `char`, `bool`, `double`  | `string`, `array`, `class`, `interface`, `object`         |
+| Behavior   | Store actual value                        | Store reference (memory address) to data                  |
+| Mutability | Typically immutable                       | Often mutable                                             |
+| Efficiency | Faster, lightweight                       | Slower, more flexible                                     |
+
+> **Immutable** means that **once a value is assigned, it cannot be changed**.
+
+```csharp
+int age = 25;
+double price = 19.99;
+bool isOnline = true;
+string name = "John";
+
+Console.WriteLine(age);
+Console.WriteLine(price);
+Console.WriteLine(isOnline);
+Console.WriteLine(name);
+```
+
+---
+
+## Value Types vs Reference Types
+
+### **Value Types:**
+
+- **What they are:** `int`, `double`, `bool`, `char`, `decimal`, and `struct`s.
+- **Where they live:** Directly on the **Stack**.
+- **Behavior:** When you assign a value type variable to another, the value is **copied**.
+
+#### Value Type Example:
+
+```csharp
+
+int a = 100; int b = a; // The value 100 is copied into b
+b = 200; // Changes b ONLY
+Console.WriteLine($"a = {a}"); // Output: a = 100
+Console.WriteLine($"b = {b}"); // Output: b = 200
+```
+
+**Reference Types:**
+
+- **What they are:** `string`, `Array`, `List`, and any `class`.
+- **Where they live:** The actual object lives on the **Heap**. A **pointer** (or reference) to the object's memory address lives on the **Stack**.
+- **Behavior:** When you assign a reference type variable to another, only the **pointer is copied**, not the actual object. Both variables now point to the _same object_ on the heap.
+
+#### Reference Type Example:
+
+```CS
+int[] arrA = { 1, 2, 3 };
+int[] arrB = arrA; // The reference (pointer) is copied. Both point to the SAME array on the heap.
+arrB[0] = 99; // This change affects the one and only array object.
+Console.WriteLine($"arrA[0] = {arrA[0]}"); //arrA[0] = 99
+Console.WriteLine($"arrB[0] = {arrB[0]}"); //arrB[0] = 99
+```
+
+---
+
+## Boxing & Unboxing
+
+Sometimes you need to treat a value type as a reference type. The CLR handles this through **boxing** and **unboxing**.
+
+**Boxing:** The process of converting a value type (from the Stack) into a `System.Object` or interface type (on the Heap). This involves creating a new object on the heap and copying the value into it.
+
+**Unboxing:** The reverse process of extracting the value from the boxed object on the Heap back to a value type on the Stack.
+
+> **C# in Depth(Book):** boxing and unboxing can have a performance cost because they involve memory allocation on the heap and type checking. Before generics were introduced in C# 2.0, this was a common performance bottleneck, especially with collections.
+
+```cs
+int num = 25; // A value type on the Stack
+object obj = num; // Boxing: num is copied to a new object on the Heap.
+int unboxedValue = (int)obj; // Unboxing: The value is copied back from the Heap to the Stack
+```
+
+---
+
+## Type Casting
+
+> **Type casting** is the process of converting a variable from one data type to another. This is often required when you want to work with different types together
+
+### 1. **Implicit Casting**
+
+- Automatically done by C#.
+- Converts a smaller type to a larger type.
+- No data loss or exceptions.
+
+```cs
+int num = 100;
+double bigNum = num; // Implicit cast from int to double
+Console.WriteLine(bigNum); // 100
+```
+
+> `int` to `double` is safe, so no need to cast explicitly.
+
+### 2. **Explicit Casting (Risky )**
+
+- You must do it manually.
+- May cause data loss or exceptions if the value doesn't fit.
+
+```cs
+double myDouble = 9.78;
+int myInt = (int)myDouble; // Explicit casting: double to int
+Console.WriteLine(myInt); // Output: 9 (fractional part is lost)
+```
+
+### 3. **Using `Convert` Class (Safe Utility Methods)**
+
+> The `Convert` class safely converts between types and handles edge cases.
+
+```cs
+string str = "123";
+int number = Convert.ToInt32(str); // Works if str is numeric
+```
+
+> **Throws `FormatException`** if the string is not numeric.
+
+### 4. **Using `Parse`**
+
+- `Parse()` converts string → numeric type (throws exception on error).
+
+```cs
+string value = "42";
+int parsedValue = int.Parse(value); // Works
+```
+
+---
+
+## Operators
+
+Operators are special symbols used to perform operations on variables and values.
+
+| Category                | Operators                | Description                                 | Example                             |
+| ----------------------- | ------------------------ | ------------------------------------------- | ----------------------------------- |
+| Arithmetic              | +, -, \*, /, %           | Addition, Subtraction, Multiplication, etc. | int result = 10 % 3; // result is 1 |
+| Relational (Comparison) | ==, !=, \>, \<, \>=, \<= | Equal to, Not equal to, Greater/Less than   | bool isOver18 = age >= 18;          |
+| Logical                 | &&, \|\|, !              | Logical AND, OR, NOT                        | bool isValid = age > 18 && hasID;   |
+| Assignment              | =, +=, -=, \*=, /=       | Assign, Add and assign, etc.                | int score = 10; score += 5;         |
+| Increment/Decrement     | ++, --                   | Increase or decrease by 1                   | int counter = 0; counter++;         |
+
+> **([Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/)):** Operator behavior is rigorously defined in the Microsoft C# language specification. For example, the `/` operator performs integer division if both operands are integers (`5 / 2` is `2`), but floating-point division if one is a double (`5.0 / 2` is `2.5`).
+
+```cs
+Console.WriteLine(5 / 2);     // Output: 2
+Console.WriteLine(5.0 / 2);   // Output: 2.5
+```
+
+### Arithmetic
+
+```cs
+int a = 10, b = 3;
+
+Console.WriteLine(a + b);  // 13
+Console.WriteLine(a - b);  // 7
+Console.WriteLine(a * b);  // 30
+Console.WriteLine(a / b);  // 3
+Console.WriteLine(a % b);  // 1
+```
+
+### Comparison & Logical
+
+> These return `true` or `false` based on conditions.
+
+```cs
+int age = 20;
+bool isAdult = age >= 18;
+bool hasTicket = true;
+
+bool canEnter = isAdult && hasTicket;    // true
+bool needHelp = age < 18 || !hasTicket;  // false
+
+```
+
+- `==` : Equal to
+- `!=` : Not equal
+- `>` : Greater than
+- `<` : Less than
+- `>=` : Greater than or equal
+- `<=` : Less than or equal
+- `&&` : Logical AND (both must be true)
+- `||` : Logical OR (either can be true)
+- `!` : NOT (reverses the boolean)
+
+### Increment/Decrement
+
+> **Used to increase or decrease by 1.**
+
+```cs
+int x = 5;
+Console.WriteLine(++x); // 6 (pre-increment: increase then use)
+Console.WriteLine(x++); // 6 (post-increment: use then increase)
+Console.WriteLine(x);   // 7
+
+int y = 3;
+Console.WriteLine(--y); // 2
+Console.WriteLine(y--); // 2
+Console.WriteLine(y);   // 1
+
+```
+
+### Assignment
+
+```cs
+int score = 10;
+score += 5;  // score = score + 5 => 15
+score -= 3;  // score = score - 3 => 12
+score *= 2;  // score = score * 2 => 24
+score /= 4;  // score = score / 4 => 6
+
+```
+
+---
+
+## Control Flow
+
+> Control flow statements allow your program to execute different code blocks based on certain conditions.
+
+### if & else
+
+```csharp
+int temp = 25;
+
+if (temp > 30)
+{
+    Console.WriteLine("hot day.");
+}
+else if (temp > 15)
+{
+    Console.WriteLine("good day.");
+}
+else
+{
+    Console.WriteLine("cold day.");
+}
+```
+
+### Ternary Operator
+
+> shorthand way to write an `if-else` statement in a single line.
+
+```csharp
+int age = 20;
+string result = (age >= 18) ? "Adult" : "Child";
+Console.WriteLine(result); //Adult
+```
+
+### Switch
+
+> The `switch` statement is a good alternative to a long `if-else if` chain when you are checking a single variable against a series of constant values
+
+```csharp
+int dayOfWeek = 3;
+string dayName;
+switch (dayOfWeek)
+{
+    case 1:
+        dayName = "Monday";
+        break; // The break statement is mandatory to exit the switch
+    case 2:
+        dayName = "Tuesday";
+        break;
+    case 3:
+        dayName = "Wednesday";
+        break;
+    default: // The default case runs if no other case matches
+        dayName = "Unknown";
+        break;
+}
+Console.WriteLine(dayName); //Wednesday
+```
+
+### **`if` vs. `switch`: When to Use Which?**
+
+- **Use `if-else` for:**
+
+  - Complex boolean expressions (`tempe > 15 && isSunny`).
+  - Checking ranges of values (e.g., `age > 18`).
+
+- **Use `switch` for:**
+
+  - Checking a single variable against a set of constant values
+  - It can be more readable and sometimes faster than a long `if-else` chain because the compiler can optimize it into a jump table.
+
+---
+
+## Loops
+
+| **Loop Type**     | **When to Use It**                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| **for loop**      | When you know the exact number of iterations.                                              |
+| **while loop**    | When you want to loop as long as a condition is true. The number of iterations is unknown. |
+| **do-while loop** | Same as while, but the loop body is guaranteed to execute at least once.                   |
+| **foreach loop**  | The simplest way to iterate over every item in a collection (like an Array or List).       |
+|                   |                                                                                            |
+
+### for loop Example
+
+```cs
+for (int i = 0; i < 5; i++)
+{
+	 Console.WriteLine(i);
+}
+// Output: 0 1 2 3 4
+```
+
+### foreach Example
+
+```cs
+string[] names = { "Karim", "Ali", "Nada" };
+foreach (string name in names)
+{
+ Console.WriteLine(name);
+}
+// Output: Karim Ali Nada
+```
+
+### while Example
+
+```cs
+int health = 100;
+
+while (health > 0)
+{
+ Console.WriteLine("Health: " + health);
+ health -= 10;
+}
+```
+
+### do-while Example
+
+```cs
+string password;
+do
+{
+ Console.Write("Enter password: ");
+ password = Console.ReadLine();
+} while (password != "1234");
+
+```
+
+### break / continue Example
+
+```csharp
+for (int i = 0; i < 10; i++)
+{
+    if (i == 5) break;
+    Console.WriteLine(i);
+}
+```
+
+---
+
+## Arrays
+
+> An **array** is a fixed-size collection of elements of the same type, stored in a contiguous block of memory. You must define its size when you create it
+
+```cs
+// Declare an integer array of size 3
+int[] scores = new int[3];
+scores[0] = 85;
+scores[1] = 92;
+scores[2] = 78;
+
+// Accessing by index
+Console.WriteLine(scores[0]); // Output: 85
+
+// Trying to access outside the bounds will cause an error
+// scores[3] = 100; // Throws IndexOutOfRangeException
+
+//Length – Get total number of elements
+Console.WriteLine("Length: " + scores.Length); // Output: 3
+
+//Sort – Sort elements in ascending order
+Array.Sort(scores);
+
+Console.WriteLine("After sorting:");
+foreach (int score in scores)
+{
+	Console.WriteLine(score);
+}
+// 78 85 92
+
+//Reverse – Reverse the order of elements
+Array.Reverse(scores);
+Console.WriteLine("After reversing:");
+foreach (int score in scores)
+{
+	Console.WriteLine(score);
+}
+// 92 85 78
+
+//IndexOf – Find the index of a specific value
+int index = Array.IndexOf(scores, 85);
+Console.WriteLine("Index of 85: " + index); // Output: 1
+
+//Copy – Copy elements to another array
+int[] copiedScores = new int[3];
+Array.Copy(scores, copiedScores, scores.Length);
+Console.WriteLine("Copied array:");
+foreach (int score in copiedScores)
+{
+	Console.WriteLine(score);
+}
+
+//Clear – Reset all values in array to default (0 for int)
+Array.Clear(scores, 0, scores.Length);
+Console.WriteLine("After clearing original array:");
+foreach (int score in scores)
+{
+	Console.WriteLine(score); // Output: 0
+}
+```
+
+---
+
+## Methods
+
+> A **method** is a block of code that performs a specific task. It helps organize your code, make it reusable, and improve readability.
+>
+> **call** (or **invoke**) that method whenever you need to perform that task.
+>
+> A method is defined by its **signature**, which specifies its accessibility, return type, name, and parameters
+
+```csharp
+
+// access_modifier [static] return_type MethodName(parameters)
+public int Add(int num1, int num2)
+{
+    int result = num1 + num2;
+    return result;
+}
+
+// Calling the method
+int sum = Add(5, 10);
+Console.WriteLine(sum); // 15
+```
+
+- **`return_type`:** The type of data the method sends back. Use `void` if it returns nothing.
+- **`parameters`:** The input data the method needs to do its work.
+
+---
+
+## Passing Data
+
+A **parameter** is a variable declared in the method's signature. It acts as a placeholder for a value that will be provided when the method is called.
+
+An **argument** is the actual value that is passed to the method when it is called.
+
+By default, C# uses **pass-by-value** for method arguments.
+
+### **What is "Passing by Value"?**
+
+When you pass a variable **by value**, a **copy** of the variable is sent to the method.
+This means the method works on a copy — any changes inside the method **don’t affect** the original variable.
+
+```cs
+void ChangeValue(int number)
+{
+    number = 100; // Only changes the local copy
+}
+
+int x = 50;
+ChangeValue(x);
+Console.WriteLine(x); // 50 (NOT 100)
+```
+
+> The original variable `x` is not affected.
+
+### **What is "Passing by Reference"?**
+
+When you pass a variable **by reference**, the method receives a **reference (address)** to the original variable.
+Any changes inside the method **will directly affect** the original variable.
+
+```cs
+void ChangeValue(ref int number)
+{
+    number = 100; // Changes the actual variable
+}
+
+int x = 50;
+ChangeValue(ref x);
+Console.WriteLine(x); // 100
+
+```
+
+> The original variable `x` is changed.
+
+---
+
+## `ref`, `out`, `params`
+
+These are **keywords** used to modify how arguments are passed into methods.
+
+### **`ref` (Pass by Reference):**
+
+> Passes the actual reference (pointer) of the variable, not a copy. Any changes made to the parameter inside the method _will affect the original variable_.
+>
+> The variable _must_ be initialized before being passed.
+>
+> Use when you need a method to modify an existing value type.
+
+```cs
+void Increment(ref int value)
+{
+    value += 1;
+}
+
+int x = 5;
+Increment(ref x);
+Console.WriteLine(x); // 6
+```
+
+### **`out` (Output Parameter):**
+
+> Similar to `ref`, but it's specifically for returning values from a method through its parameters.
+>
+> The variable does _not_ need to be initialized before being passed.
+> The method _must_ assign a value to it before it returns.
+>
+> use When a method needs to return more than one value. The `TryParse` methods are a classic example.
+
+```cs
+bool IsValidNumber(string input, out int result)
+{
+    return int.TryParse(input, out result);
+}
+
+IsValidNumber("123", out int parsedValue); // parsedValue is now 123
+```
+
+### **`params` (Parameter Array):**
+
+> **Allows a method to accept a variable number of arguments. It must be the _last_ parameter in the method signature.**
+>
+> use For utility methods where the number of inputs is flexible.
+
+```cs
+double Average(params double[] numbers)
+{
+    double sum = 0;
+    foreach (var n in numbers) sum += n;
+    return sum / numbers.Length;
+}
+
+double avg1 = Average(2, 4, 6); // Call with 3 arguments
+double avg2 = Average(10, 20);    // Call with 2 arguments
+```
