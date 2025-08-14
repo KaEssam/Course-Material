@@ -1,0 +1,505 @@
+---
+title: 'Session 3 - Inheritance and Polymorphism in C#'
+tags: ['Inheritance', 'Polymorphism', 'Method Overriding']
+---
+
+## Inheritance and Polymorphism in C#
+
+---
+
+## Table of Contents
+
+1. [What is Inheritance?](#what-is-inheritance)
+2. [ What is Polymorphism?](#what-is-polymorphism)
+3. [ Building Class Hierarchies](#building-class-hierarchies)
+4. [Method Overriding Deep Dive](#method-overriding-deep-dive)
+5. [ Access Modifiers with Inheritance](#access-modifiers-with-inheritance)
+6. [ Best Practices](#best-practices)
+
+---
+
+## What is Inheritance?
+
+**Inheritance** is the ability of a class to inherit properties and methods from another class. It creates an **IS-A** relationship between classes.
+
+Think about family inheritance:
+
+- You inherit traits from your parents (eye color, height)
+- But you also have your own unique characteristics
+- You can do everything your parents taught you, plus your own things
+
+### Code Example
+
+```csharp
+
+// Base class (Parent)
+
+public class Animal
+
+{
+    public string Name { get; set; }
+    public virtual void MakeSound() { Console.WriteLine("Some sound"); }
+
+}
+
+
+
+// Derived class (Child)
+public class Dog : Animal  // Dog IS-A Animal
+
+{
+    public override void MakeSound() { Console.WriteLine("Woof!"); }
+    public void Fetch() { Console.WriteLine("Fetching ball!"); } // New behavior
+
+}
+
+```
+
+### Benefits of Inheritance
+
+- **Code Reuse**: Don't repeat common functionality
+- **Hierarchical Organization**: Models real-world relationships
+- **Maintainability**: Changes to base class affect all derived classes
+- **Extensibility**: Easy to add new types
+
+---
+
+## What is Polymorphism?
+
+**Polymorphism** means "many forms." It allows objects of different types to be treated uniformly while behaving differently based on their actual type.
+
+Think about different vehicles:
+
+- All vehicles can "start", but:
+  - Car: Turn ignition key
+  - Bicycle: Start pedaling
+  - Airplane: Start engines
+- Same command ("start"), different implementations!
+
+### Code Example
+
+```csharp
+
+// Polymorphism in action
+
+Animal[] animals = {
+    new Animal(),
+    new Dog(),
+    new Cat()
+
+};
+
+foreach(Animal animal in animals)
+
+{
+    animal.MakeSound(); // Different sound for each type!
+}
+// Output: "Some sound", "Woof!", "Meow!"
+
+```
+
+### Types of Polymorphism
+
+1. **Runtime Polymorphism** (Method Overriding): `virtual`/`override`
+2. **Compile-time Polymorphism** (Method Overloading): Multiple methods with same name
+3. **Property Polymorphism**: Properties that behave differently in derived classes
+
+---
+
+## Building Class Hierarchies
+
+### Base Class Design
+
+```csharp
+
+public class LibraryItem
+
+{
+    // Common properties for ALL library items
+    public string ItemId { get; protected set; }
+    public virtual string Title { get; set; }  // Can be overridden
+    public DateTime DateAdded { get; private set; } // Cannot be overridden
+
+
+    // Virtual methods that derived classes can customize
+    public virtual void DisplayInfo() { /* base implementation */ }
+    public virtual bool Borrow(string borrower) { /* base logic */ }
+
+}
+
+```
+
+#### Derived Class Implementation
+
+```csharp
+
+public class Book : LibraryItem
+
+{
+    // New properties specific to books
+    public string Author { get; set; }
+    public int PageCount { get; set; }
+
+
+
+    // Override base behavior
+    public override void DisplayInfo()
+
+    {
+        base.DisplayInfo(); // Call parent version first
+        Console.WriteLine($"Author: {Author}");
+        Console.WriteLine($"Pages: {PageCount}");
+
+    }
+
+
+    // Override with specialized logic
+    public override bool Borrow(string borrower)
+
+    {
+        if (IsReferenceBook) return false; // Reference books can't be borrowed
+        return base.Borrow(borrower); // Use base logic for other books
+
+    }
+
+}
+
+```
+
+---
+
+## Method Overriding
+
+### Keywords Explained
+
+#### `virtual` Keyword (Base Class)
+
+```csharp
+
+public class Animal
+
+{
+    // virtual = "derived classes CAN override this method"
+    public virtual void MakeSound()
+    {
+        Console.WriteLine("Generic animal sound");
+    }
+
+
+    // Not virtual = "derived classes CANNOT override this method"
+    public void Sleep()
+    {
+        Console.WriteLine("Sleeping...");
+    }
+
+}
+
+```
+
+#### `override` Keyword (Derived Class)
+
+```csharp
+
+public class Dog : Animal
+
+{
+    // override = "I'm replacing the base class implementation"
+    public override void MakeSound()
+    {
+        Console.WriteLine("Woof!");
+    }
+
+    // This would be an error - Sleep() is not virtual
+    // public override void Sleep() { } // ❌ Compiler error
+
+}
+
+```
+
+#### `base` Keyword (Calling Parent)
+
+```csharp
+
+public class Puppy : Dog
+
+{
+    public override void MakeSound()
+    {
+        Console.WriteLine("Before base call");
+        base.MakeSound(); // Calls Dog's version ("Woof!")
+        Console.WriteLine("After base call");
+
+    }
+
+}
+
+```
+
+#### `sealed` Keyword (Stop Overriding)
+
+```csharp
+
+public class Dog : Animal
+
+{
+    // sealed = "no class can override this method further"
+    public sealed override void MakeSound()
+    {
+        Console.WriteLine("Woof!");
+    }
+}
+
+
+
+public class Puppy : Dog
+{
+    // This would be an error - MakeSound is sealed in Dog
+    // public override void MakeSound() { } // ❌ Compiler error
+}
+
+```
+
+### Method Overriding vs Method Hiding with `new` Keyword
+
+#### Method Overriding ( Recommended - True Polymorphism)
+
+```csharp
+
+public class Base
+
+{
+    public virtual void Method() { Console.WriteLine("Base"); }
+}
+
+
+
+public class Derived : Base
+
+{
+    public override void Method() { Console.WriteLine("Derived"); }
+}
+
+// Usage - TRUE POLYMORPHISM
+Base obj = new Derived();
+obj.Method(); // Output: "Derived" (polymorphic call)
+
+```
+
+#### Method Hiding with `new` Keyword (⚠️ Use with caution - NOT Polymorphic)
+
+```csharp
+
+public class Base
+{
+    public void Method() { Console.WriteLine("Base"); }
+}
+
+
+
+public class Derived : Base
+{
+    public new void Method() { Console.WriteLine("Derived"); }
+}
+
+
+// Usage - METHOD HIDING (NOT polymorphic)
+Base obj = new Derived();
+obj.Method(); // Output: "Base" (calls base version!)
+Derived obj2 = new Derived();
+obj2.Method(); // Output: "Derived" (calls derived version)
+
+```
+
+The `new` keyword in inheritance has a specific purpose: **intentional method hiding**.
+
+##### 1. When to Use `new` Keyword
+
+```csharp
+
+public class Vehicle
+{
+    public void Start() // NOT virtual
+    {
+       Console.WriteLine("Vehicle starting...");
+    }
+}
+
+
+
+public class Car : Vehicle
+{
+    // ✅ Use 'new' when you want to hide (not override) a base method
+    public new void Start()
+    {
+        Console.WriteLine("Car engine starting...");
+    }
+
+}
+
+
+
+public class ElectricCar : Car
+
+{
+    // ✅ Can hide Car's Start method too
+    public new void Start()
+    {
+        Console.WriteLine("Electric motor starting silently...");
+    }
+
+}
+
+```
+
+#### Summary: `override` vs `new`
+
+| Aspect                 | `override`                                             | `new`                                              |
+| ---------------------- | ------------------------------------------------------ | -------------------------------------------------- |
+| **Purpose**            | Customize virtual method behavior                      | Hide non-virtual method                            |
+| **Polymorphism**       | ✅ Yes - calls derived version through base reference  | ❌ No - calls base version through base reference  |
+| **Base Method**        | Must be `virtual`, `abstract`, or `override`           | Can be any method                                  |
+| **Inheritance Chain**  | Continues polymorphic chain                            | Starts new hiding chain                            |
+| **When to Use**        | Normal inheritance scenarios                           | Legacy integration, intentional API changes        |
+| **Best Practice**      | Preferred for polymorphic behavior                     | Use sparingly, document thoroughly                 |
+
+---
+
+## Access Modifiers with Inheritance
+
+### Access Levels Explained
+
+| Modifier              | Same Class | Derived Class  | Same Assembly  | Other Assembly |
+| --------------------- | ---------- | -------------- | -------------- | -------------- |
+| `private`             | ✅         | ❌             | ❌             | ❌             |
+| `protected`           | ✅         | ✅             | ❌             | ❌             |
+| `internal`            | ✅         | ✅             | ✅             | ❌             |
+| `protected internal`  | ✅         | ✅             | ✅             | ❌             |
+| `public`              | ✅         | ✅             | ✅             | ✅             |
+
+### Practical Examples
+
+```csharp
+
+public class User
+
+{
+    private string _password;           // Only User class can access
+    protected string _email;            // User and derived classes can access
+    internal string _internalId;        // Same assembly only
+    public string Name;                 // Everyone can access
+
+
+    protected virtual void LogActivity(string activity)
+    {
+        // Available to derived classes for extending
+        Console.WriteLine($"User activity: {activity}");
+    }
+}
+
+
+
+public class Librarian : User
+{
+    public void DoSomething()
+    {
+        // _password;     // ❌ Error - private to User
+        _email = "new@email.com";  // ✅ OK - protected
+        Name = "New Name";         // ✅ OK - publi
+        LogActivity("Librarian action"); // ✅ OK - protected method
+    }
+
+
+
+    protected override void LogActivity(string activity)
+    {
+        base.LogActivity(activity); // Call parent version
+        Console.WriteLine($"Librarian-specific logging: {activity}");
+    }
+
+}
+
+```
+
+---
+
+## Best Practices
+
+### 1. Design for Inheritance
+
+```csharp
+
+// ✅ Good: Virtual methods allow customization
+public class BaseClass
+
+{
+    public virtual void ProcessData() { /* implementation */ }
+    protected virtual void ValidateData() { /* implementation */ }
+}
+
+
+// ❌ Poor: No virtual methods = no customization
+public class BadBaseClass
+{
+    public void ProcessData() { /* sealed implementation */ }
+}
+
+```
+
+### 2. Use Protected for Derived Class Access
+
+```csharp
+
+public class User
+
+{
+    protected string _userId;    // ✅ Derived classes can access
+    private string _password;    // ✅ Keep sensitive data private
+   
+    protected void LogActivity(string message) // ✅ Utility for derived classes
+    {
+        Console.WriteLine($"[{_userId}] {message}");
+    }
+
+}
+
+```
+
+### 3. Call Base Constructors Explicitly
+
+```csharp
+
+public class User
+
+{
+    public User(string name, string email) { /* initialization */ }
+}
+
+
+
+public class Librarian : User
+{
+    // ✅ Good: Explicit base constructor call
+    public Librarian(string name, string email, string employeeId)
+        : base(name, email)
+    {
+        EmployeeId = employeeId;
+    }
+}
+
+```
+
+### 4. Override ToString()
+
+```csharp
+
+public class User
+
+{
+    public override string ToString()
+    {
+        return $"User: {Name} (ID: {UserId})";
+
+    }
+}
+
+```
