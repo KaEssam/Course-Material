@@ -1,0 +1,32 @@
+# BankAccount Inheritance & Polymorphism Assignment
+
+## Class Structure
+
+- Create base class: `BankAccount` (from Phase 1)
+- Create derived class: `SavingAccount : BankAccount`
+- Create derived class: `CurrentAccount : BankAccount`
+
+## Additional Fields
+
+- `SavingAccount` → `InterestRate` (`decimal`)
+- `CurrentAccount` → `OverdraftLimit` (`decimal`)
+
+## Polymorphism
+
+- In `BankAccount`:
+- In `SavingAccount`:
+- In `CurrentAccount`:
+
+## Method: ShowAccountDetails()
+
+- Inherited from base class
+- Can be overridden to include extra fields (`InterestRate` or `OverdraftLimit`)
+
+## In Main()
+
+- Create object of `SavingAccount`
+- Create object of `CurrentAccount`
+- Add both to `List<BankAccount>`
+- Loop and call:
+  - `ShowAccountDetails()`
+  - `CalculateInterest()`
