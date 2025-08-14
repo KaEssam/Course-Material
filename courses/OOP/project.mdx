@@ -1,0 +1,52 @@
+
+# Examination System – Requirements
+
+## 1. Core Entities
+- The system should manage **courses**, **students**, and **instructors**.
+- Each course has:
+	- Title
+	- Description
+	- Maximum degree
+- Each student has:
+	- ID
+	- Name
+	- Email
+	- Can enroll in multiple courses
+- Each instructor has:
+	- ID
+	- Name
+	- Specialization
+	- Can teach multiple courses
+
+## 2. Question Types
+- The system should support different types of questions:
+	- Multiple Choice (with options and a correct answer)
+	- True/False
+	- Essay/Text (no auto-check)
+
+## 3. Exam Management
+- An exam belongs to a course and contains a set of questions
+- The system should allow:
+	- Adding, editing, and removing questions in an exam
+	- Assigning marks for each question
+	- Preventing adding more marks to the exam than the maximum allowed for the course
+	- Preventing modifying an exam once it starts
+	- Instructors to duplicate an existing exam for another course
+
+## 4. Student Experience
+- Students can:
+	- Take an exam
+	- Answer questions
+	- Get a final score
+
+## 5. Reporting & Comparison
+- The system should display a report showing:
+	- Exam title
+	- Student name
+	- Course name
+	- Score
+	- Pass/fail status
+- The system should support comparing two students by their scores in an exam
+
+## 6. Data Storage
+- The system should store all created courses, students, instructors, and exams in memory while the program runs
