@@ -1,0 +1,690 @@
+---
+title: 'Session 2 - Class Members & Encapsulation'
+tags: ['Fields', 'Properties', 'Constructors', 'Methods']
+---
+
+## 1. Fields vs Properties
+
+**Fields** are variables that store data directly:
+
+```csharp
+
+public class Book
+
+{
+
+    public string title; // Field - direct access, no protection
+
+}
+
+```
+
+**Properties** provide controlled access to data:
+
+```csharp
+
+public class Book
+
+{
+
+    private string _title; // Private field - protected storage
+    public string Title    // Property - controlled access
+
+    {
+        get { return _title; }
+        set
+
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Title cannot be empty");
+            _title = value.Trim();
+        }
+    }
+}
+
+```
+
+### Key Benefits of Properties
+
+- **Validation**: Prevent invalid data
+- **Processing**: Clean and format data
+- **Computed Values**: Calculate values on-the-fly
+- **Future-Proofing**: Can add logic later without breaking code
+
+---
+
+## 2. Access Modifiers
+
+| Modifier    | Visibility                 | Usage                          |
+| ----------- | -------------------------- | ------------------------------ |
+| `private`   | Only within the same class | Internal data, helper methods  |
+| `protected` | Class and derived classes  | Inheritance scenarios          |
+| `internal`  | Same assembly/project      | Framework/library internal use |
+| `public`    | Everywhere                 | Public interface of your class |
+
+### Example
+
+```csharp
+
+public class Book
+
+{
+    // Private fields - only this class can access
+    private string _title;
+    private string _author;
+
+    // Public properties - external code can access
+    public string Title { get; set; }
+    public string Author { get; set; }
+
+    // Private methods - internal helper logic
+    private string FormatName(string name) { ... }
+
+    // Public methods - class functionality
+    public void DisplayInfo() { ... }
+
+}
+
+```
+
+---
+
+## 3. Constants and Readonly
+
+**Constants** - Compile-time values, shared across all instances:
+
+```csharp
+
+public const int MAX_BORROWED_BOOKS = 3;
+public const string DEFAULT_USER_TYPE = "Standard";
+
+```
+
+**Readonly** - Runtime values, set once per instance:
+
+```csharp
+
+public readonly int UserId;
+public readonly DateTime AccountCreatedDate;
+
+
+
+public User()
+
+{
+    UserId = GenerateUserId();        // Set in constructor
+    AccountCreatedDate = DateTime.Now; // Different for each user
+}
+
+```
+
+**Static Readonly** - Runtime values, same for all instances:
+
+```csharp
+public static readonly string LibraryBranch = "Main Branch";
+```
+
+### When to Use What?
+
+- **`const`**: Mathematical constants, configuration values that never change
+- **`readonly`**: Instance-specific values set at creation (IDs, timestamps)
+- **`static readonly`**: Class-wide values that might be computed at runtime
+
+---
+
+## 4. Properties
+
+### Property Types
+
+#### Full Properties (with backing fields)
+
+```csharp
+
+private string _title;
+
+public string Title
+
+{
+    get { return _title; }
+    set
+    {
+
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("Title cannot be empty");
+        _title = value.Trim();
+
+    }
+}
+
+```
+
+#### Auto-Properties
+
+```csharp
+public string Publisher { get; set; } = "Unknown Publisher";
+public bool IsActive { get; set; } = true;
+
+```
+
+#### Read-Only Properties
+
+```csharp
+public string SecurityCode { get; } // Can only be set in constructor
+
+public bool IsAvailable => _availableCopies > 0; // Computed property
+
+```
+
+#### Private Setters
+
+```csharp
+
+public int BorrowedBooks { get; private set; } // Only class can modify
+
+```
+
+### Computed Properties
+
+Properties that calculate their values:
+
+```csharp
+
+public bool CanBorrow => BorrowedBooks < MAX_BORROWED_BOOKS;
+
+public int AvailableBorrowSlots => MAX_BORROWED_BOOKS - BorrowedBooks;
+
+public bool IsNewRelease => DateTime.Now.Subtract(PublishedDate).Days <= 365;
+
+```
+
+---
+
+## 5. Constructors
+
+### Default Constructor
+
+A constructor with **no parameters** that provides default values for all fields.
+
+```csharp
+
+public Book()
+
+{
+    Title = "Unknown Title";
+    Author = "Unknown Author";
+    ISBN = "0000000000";
+    AvailableCopies = 0;
+
+}
+
+```
+
+#### **Key Points**:
+
+- **Automatic**: If you don't define ANY constructor, C# provides a default one
+- **Explicit**: You can define your own with custom initialization
+- **Validation**: Still goes through property setters if you use them
+
+### Parameterized Constructor
+
+Multiple Parameter Combinations
+
+```csharp
+
+public Book(string title, string author, string isbn, int availableCopies)
+
+{
+
+    Title = title;           // Uses property validation
+
+    Author = author;
+
+    ISBN = isbn;
+
+    AvailableCopies = availableCopies;
+
+}
+
+```
+
+### Constructor Chaining
+
+#### Using `this()` to Chain Constructors
+
+Constructor chaining allows one constructor to call another, reducing code duplication.
+
+```csharp
+
+public class Book
+
+{
+    /// QUICK CONSTRUCTOR - Single copy default
+    /// Chains to the 4-parameter constructor with defaulted copies
+    public Book(string title, string author, string isbn)
+        : this(title, author, isbn, 1) // Calls 4-parameter constructor
+
+    {
+        Console.WriteLine("🔧 Quick Constructor called (chaining to 4-parameter)");
+        // Additional initialization can go here if needed
+
+    }
+
+
+    /// CONDITIONAL CONSTRUCTOR - Popular books get more copies
+    /// Chains with conditional logic
+
+    public Book(string title, string author, string isbn, bool isPopular)
+
+        : this(title, author, isbn, isPopular ? 5 : 1) // Conditional chaining
+
+    {
+
+        Console.WriteLine($"🔧 Conditional Constructor called (Popular: {isPopular})");
+
+    }
+
+
+
+
+   /// EXTENDED CONSTRUCTOR - Chains to basic, then adds more
+
+    public Book(string title, string author, string isbn, int availableCopies, DateTime publishedDate)
+
+        : this(title, author, isbn, availableCopies) // Chain to basic constructor
+
+    {
+        Console.WriteLine("🔧 Extended Constructor called (with chaining)");
+
+
+        // Override the default date with provided date
+        PublishedDate = publishedDate;
+
+    }
+
+
+
+
+ /// FULL CONSTRUCTOR - Chains and then sets additional properties
+    public Book(string title, string author, string isbn, int availableCopies,
+
+               DateTime publishedDate, string publisher, string genre, decimal price)
+
+        : this(title, author, isbn, availableCopies, publishedDate) // Chain to extended
+
+    {
+
+        Console.WriteLine("🔧 Full Constructor called (final in chain)");
+
+
+
+        // Set the additional properties
+        Publisher = publisher;
+        Genre = genre;
+        Price = price;
+
+    }
+
+}
+
+```
+
+#### Chaining Benefits:
+
+- **DRY Principle**: Don't Repeat Yourself
+- **Centralized Logic**: Main initialization in one place
+- **Easier Maintenance**: Changes in one constructor affect all
+- **Clear Intent**: Shows relationship between constructors
+
+### 5. Copy Constructor
+
+##### Creating Objects from Existing Objects
+
+C# doesn't have built-in copy constructors like C++, but we can create our own.
+
+````csharp
+
+public class Book
+
+{
+
+ 
+
+    /// COPY CONSTRUCTOR - Creates new book from existing one
+    /// Called when: new Book(existingBook)
+    /// Creates a separate, independent object with same values
+
+    public Book(Book originalBook)
+
+    {
+
+        Console.WriteLine("🔧 Copy Constructor called");
+        if (originalBook == null)
+            throw new ArgumentNullException(nameof(originalBook), "Cannot copy from null book");
+
+
+        // Generate NEW readonly fields (this is a new object)
+        BookId = GenerateBookId();      // New ID
+        CreatedDate = DateTime.Now;     // New creation time
+        Barcode = GenerateBarcode();    // New barcode
+        // Copy all properties from original book
+        Title = originalBook.Title;
+        Author = originalBook.Author;
+        ISBN = originalBook.ISBN;
+        AvailableCopies = originalBook.AvailableCopies;
+        PublishedDate = originalBook.PublishedDate;
+        Publisher = originalBook.Publisher;
+        Genre = originalBook.Genre;
+        Price = originalBook.Price;
+        // Update static counters
+        _totalBooksCreated++;
+        UpdateBookCounts();
+
+    }
+    ```
+   
+ 
+#### Copy Constructor Use Cases
+
+- **Backup/Snapshot**: Create backup before modifications
+- **Template Objects**: Create similar objects from templates
+- **Undo/Redo**: Store object states for undo functionality
+- **Parallel Processing**: Create independent copies for threads
+
+### Static Constructor
+
+A **static constructor** is called automatically **ONCE** when the class is first accessed. It has no access modifiers, no parameters, and cannot be called directly.
+
+```csharp
+
+public class Book
+
+{
+
+    // Static fields
+    public static readonly string LibraryName;
+    private static int _totalBooksCreated = 0;
+
+
+    /// STATIC CONSTRUCTOR - Runs once when class is first accessed
+    /// - No access modifier (not public, private, etc.)
+    /// - No parameters allowed
+    /// - Cannot be called directly
+    /// - Automatically called before first instance creation or static member access
+
+    static Book()
+
+    {
+
+        Console.WriteLine("📚 Static Constructor: Initializing Book class...");
+
+        // Initialize static readonly fields
+        LibraryName = "Central City Library";
+        // Perform one-time setup
+
+        Console.WriteLine($"Library Name set to: {LibraryName}");
+        // Could load configuration, initialize databases, etc.
+        LoadBookConfiguration();
+    }
+
+
+
+    private static void LoadBookConfiguration()
+
+    {
+        // Simulate loading configuration
+        Console.WriteLine("Loading book configuration...");
+
+    }
+
+}
+
+````
+
+#### Use Static Constructor For:
+
+- **One-time initialization** of static fields
+- **Loading configuration** from files/databases
+- **Initializing static collections** or caches
+- **Setting up logging** or debugging
+- **Registering types** in frameworks
+
+### Constructor Best Practices
+
+1. **Use properties in constructors** - Gets validation automatically
+2. **Chain constructors** - Reduces code duplication
+3. **Initialize readonly fields** - Must be done in constructor
+4. **Validate parameters** - Fail fast with meaningful errors
+
+---
+
+## 6. Methods
+
+### Method Types
+
+#### Public Methods
+
+```csharp
+
+public void DisplayInfo()           // Shows object state
+public bool BorrowBook()           // Business logic
+public void UpdateContactInfo()    // Modify object
+
+```
+
+#### Private Methods (Helper Logic)
+
+```csharp
+
+private string FormatName(string name)      // Data processing
+private bool IsValidEmail(string email)    // Validation
+private static int GenerateUserId()        // Utility function
+
+```
+
+#### Static Methods (Class-Level Behavior)
+
+```csharp
+
+public static bool AreEqual(Book book1, Book book2)
+public static void GetLibraryInfo()
+
+```
+
+### Method Design Principles
+
+1. **Single Responsibility** - Each method does one thing
+2. **Meaningful Names** - Clear what the method does
+3. **Return Values** - Indicate success/failure
+4. **Validation** - Check parameters and state
+5. **Error Handling** - Provide meaningful error messages
+
+---
+
+## 7. What C# Does Better
+
+### C# Encapsulation Advantages
+
+#### 1. **Properties Instead of Get/Set Methods**
+
+```csharp
+
+// Java style (verbose)
+book.setTitle("Clean Code");
+String title = book.getTitle()
+
+
+// C# style (clean)
+book.Title = "Clean Code";
+string title = book.Title;
+
+```
+
+#### 2. **Auto-Properties**
+
+```csharp
+
+// No need for backing fields for simple properties
+public string Publisher { get; set; }
+public decimal Price { get; set; } = 0.0m;
+
+```
+
+#### 3. **Expression-Bodied Members**
+
+```csharp
+
+// Concise computed properties
+public bool IsAvailable => _availableCopies > 0;
+
+public int BookAge => DateTime.Now.Year - _publishedDate.Year;
+
+```
+
+#### 4. **Nullable Types**
+
+```csharp
+
+public DateTime? LastLoginDate { get; set; } // Can be null
+
+```
+
+#### 5. **Property Initializers**
+
+```csharp
+
+public string UserType { get; set; } = "Standard"; // Default value
+
+```
+
+#### 6. **Private Setters**
+
+```csharp
+
+public int BorrowedBooks { get; private set; } // External read, internal write
+
+```
+
+#### 7. **Constructor Chaining**
+
+```csharp
+
+public User(string name, string email) : this() // Chain to default constructor
+
+```
+
+#### 8. **Object Initializers**
+
+```csharp
+
+var book = new Book("Title", "Author", "ISBN")
+
+{
+    Publisher = "Publisher",
+    Genre = "Fiction",
+    Price = 29.99m
+
+};
+
+```
+
+---
+
+## 8. Best Practices
+
+### ✅ Do
+
+1. \*\*Always use properties for public data access
+
+```csharp
+
+public string Title { get; set; } // Good
+
+public string title;              // Bad
+
+```
+
+2. **Validate in property setters**
+
+```csharp
+
+set
+
+{
+
+if (string.IsNullOrWhiteSpace(value))
+
+throw new ArgumentException("Title cannot be empty");
+
+\_title = value.Trim();
+
+}
+
+```
+
+3. **Use readonly for immutable data**
+
+```csharp
+
+public readonly int BookId;
+
+```
+
+4. **Use const for true constants**
+
+```csharp
+
+public const int MAX_BOOKS = 3;
+
+```
+
+5. **Make helper methods private**
+
+```csharp
+
+private string FormatName(string name) { ... }
+
+```
+
+6. **Use constructor chaining**
+
+```csharp
+
+public Book(string title) : this(title, "Unknown", "0000000000") { }
+
+```
+
+### ❌ Don
+
+1. **Don't expose fields directly**
+
+```csharp
+
+public string \_title; // Bad - private field exposed
+
+```
+
+2. **Don't skip validation**
+
+```csharp
+
+set { \_title = value; } // Bad - no validation
+
+```
+
+3. **Don't make everything public**
+
+```csharp
+
+public string FormatName() // Bad - helper should be private
+
+```
+
+4. **Don't repeat validation logic**
+
+```csharp
+
+// Bad - duplicate validation in multiple constructors
+
+// Good - use constructor chaining
+
+```
