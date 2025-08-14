@@ -1,0 +1,1353 @@
+---
+title: 'Session 4 - Abstract, Interface, Static, Sealed, Partial, Nested, Structs, Destructors, Operators'
+tags:
+  [
+    'Abstract Classes',
+    'Interfaces',
+    'Static',
+    'Sealed',
+    'Partial',
+    'Nested',
+    'Structs',
+    'Destructors',
+    'Operator Overloading',
+  ]
+---
+
+## Table of Contents
+
+1. [Abstract Classes - Shared Implementation](#2-abstract-classes)
+2. [Interfaces - Contracts and Capabilities](#1-interfaces)
+3. [Static Classes and Members](#3-static-classes-and-members)
+4. [Sealed Classes and Methods](#4-sealed-classes-and-methods)
+5. [Partial Classes - Split Implementation](#5-partial-classes)
+6. [Nested Classes - Classes Within Classes](#6-nested-classes)
+7. [Structs - Value Types vs Reference Types](#7-structs)
+8. [Destructors](#8-destructors)
+9. [Operator Overloading](#10-operator-overloading)
+
+---
+
+## 1. Abstract Classes - Shared Implementation
+
+### What is an Abstract Class?
+
+> **Think of it like this:** An abstract class is like a blueprint with some rooms already built and some rooms you must build yourself. It provides shared implementation BUT forces you to complete the missing pieces.
+
+Think of a house blueprint:
+
+- **Foundation & plumbing:** Already designed (concrete methods)
+- **Room layout:** You must customize (abstract methods)
+- **Same basic structure, personalized finishing!**
+
+### Basic Abstract Class
+
+```csharp
+// Abstract class - cannot be instantiated directly
+public abstract class LibraryItem
+{
+    // Concrete fields and properties (shared implementation)
+    protected string _title;
+    protected string _itemId;
+
+    public string Title
+    {
+        get => _title;
+        set => _title = value?.Trim() ?? throw new ArgumentNullException();
+    }
+
+    public string ItemId => _itemId;
+
+    // Abstract properties - MUST be implemented by derived classes
+    public abstract string ItemType { get; }
+
+    // Concrete constructor (shared initialization)
+    protected LibraryItem(string title, string itemId)
+    {
+        Title = title;
+        _itemId = itemId;
+    }
+
+    // Concrete method (shared implementation)
+    public virtual void DisplayBasicInfo()
+    {
+        Console.WriteLine($"Item: {Title}");
+        Console.WriteLine($"Type: {ItemType}");
+        Console.WriteLine($"ID: {ItemId}");
+    }
+
+    // Abstract method - MUST be implemented by derived classes
+    public abstract void DisplayDetailedInfo();
+
+    // Virtual method - CAN be overridden by derived classes
+    public virtual string GetDescription()
+    {
+        return $"{ItemType}: {Title}";
+    }
+}
+```
+
+### Implementing Abstract Classes
+
+```csharp
+// Concrete implementation of abstract class
+public class Book : LibraryItem
+{
+    private string _author;
+    private string _isbn;
+
+    public string Author
+    {
+        get => _author;
+        set => _author = value?.Trim() ?? throw new ArgumentNullException();
+    }
+
+    public string ISBN
+    {
+        get => _isbn;
+        set => _isbn = value?.Trim() ?? throw new ArgumentNullException();
+    }
+
+    // Constructor must call base constructor
+    public Book(string title, string author, string isbn)
+        : base(title, $"BOOK_{isbn}")
+    {
+        Author = author;
+        ISBN = isbn;
+    }
+
+    // MUST implement abstract properties
+    public override string ItemType => "Book";
+
+    // MUST implement abstract methods
+    public override void DisplayDetailedInfo()
+    {
+        DisplayBasicInfo(); // Use inherited method
+        Console.WriteLine($"Author: {Author}");
+        Console.WriteLine($"ISBN: {ISBN}");
+    }
+
+    // CAN override virtual methods
+    public override string GetDescription()
+    {
+        return $"Book: '{Title}' by {Author}";
+    }
+}
+```
+
+### When to Use Abstract Classes
+
+- **Shared implementation:** When multiple classes need common functionality
+- **Enforced structure:** When you want to force derived classes to implement specific methods
+- **IS-A relationship:** When there's a clear inheritance hierarchy
+- **Code reuse:** When you want to avoid duplicating code
+
+---
+
+## 2. Interfaces
+
+### What is an Interface?
+
+> **Think of it like this:** An interface is like a contract or job description. It says "Any class that implements me MUST provide these methods and properties." It defines **WHAT** something can do, not **HOW** it does it.
+
+Imagine you're hiring drivers for your delivery company:
+
+- **Interface:** "All drivers must be able to start, stop, and navigate"
+- **Implementation:** How they do it depends on the vehicle (car, motorcycle, truck)
+- **Same contract, different implementations!**
+
+### Basic Interface Example
+
+```csharp
+// Interface - defines a contract
+public interface IBorrowable
+{
+    // Properties that must be implemented
+    bool IsAvailable { get; }
+    DateTime? BorrowDate { get; }
+    int MaxBorrowDays { get; }
+
+    // Methods that must be implemented
+    bool Borrow(string borrowerName);
+    bool Return();
+    bool IsOverdue();
+}
+```
+
+### Implementing Interfaces
+
+```csharp
+// Book implements the IBorrowable contract
+public class Book : LibraryItem, IBorrowable
+{
+    private bool _isAvailable = true;
+    private DateTime? _borrowDate;
+    private string? _borrowerName;
+
+    // MUST implement all interface members
+    public bool IsAvailable => _isAvailable;
+    public DateTime? BorrowDate => _borrowDate;
+    public int MaxBorrowDays => 21; // 3 weeks for books
+
+    public bool Borrow(string borrowerName)
+    {
+        if (!IsAvailable) return false;
+
+        _isAvailable = false;
+        _borrowDate = DateTime.Now;
+        _borrowerName = borrowerName;
+        return true;
+    }
+
+    public bool Return()
+    {
+        _isAvailable = true;
+        _borrowDate = null;
+        _borrowerName = null;
+        return true;
+    }
+
+    public bool IsOverdue()
+    {
+        if (IsAvailable || !_borrowDate.HasValue)
+            return false;
+
+        return DateTime.Now > _borrowDate.Value.AddDays(MaxBorrowDays);
+    }
+}
+```
+
+### Multiple Interface Implementation
+
+```csharp
+// A book can implement multiple interfaces
+public class Book : LibraryItem, IBorrowable, ISearchable, IRenewable
+{
+    // Implements IBorrowable
+    public bool IsAvailable => _isAvailable;
+    public bool Borrow(string borrowerName) { /* implementation */ }
+
+    // Implements ISearchable
+    public bool MatchesSearchTerm(string term) { /* implementation */ }
+    public string[] GetSearchKeywords() { /* implementation */ }
+
+    // Implements IRenewable
+    public bool CanRenew() { /* implementation */ }
+    public bool Renew() { /* implementation */ }
+}
+```
+
+### Interface Polymorphism
+
+```csharp
+// Same interface, different implementations
+IBorrowable[] items = {
+    new Book("C# Guide", "Author", "123"),
+    new DVD("The Matrix", "Wachowski", 136),
+    new Equipment("Laptop", "Dell", "LAP001")
+};
+
+// Same method call, different behaviors!
+foreach (IBorrowable item in items)
+{
+    Console.WriteLine($"Available: {item.IsAvailable}");
+    Console.WriteLine($"Max days: {item.MaxBorrowDays}");
+    // Each type implements this differently!
+}
+```
+
+### When to Use Interfaces
+
+- **Multiple capabilities:** When objects need multiple "can-do" abilities
+- **No shared implementation:** When classes are too different to share code
+- **Flexibility:** When you want to change implementations at runtime
+- **Testing:** Interfaces make mocking and testing easier
+
+### Interfaces vs Abstract Classes
+
+| Aspect                   | Interface                         | Abstract Class                 |
+| ------------------------ | --------------------------------- | ------------------------------ |
+| **Implementation**       | No implementation (contract only) | Can have shared implementation |
+| **Multiple inheritance** | Can implement many                | Can inherit from one only      |
+| **Fields**               | No fields allowed                 | Can have fields                |
+| **Constructors**         | No constructors                   | Can have constructors          |
+| **Access modifiers**     | All public                        | All access levels              |
+
+---
+
+## 3. Static Classes and Members
+
+### What are Static Members?
+
+> **Think of it like this:** Static members belong to the class itself, not to any specific instance. It's like having a shared tool that everyone in the class can use, but no one owns personally.
+
+Think of a library's shared resources:
+
+- **Static:** The library's address (same for everyone)
+- **Instance:** Each visitor's library card (unique to each person)
+
+### Static Classes
+
+```csharp
+// Static class - cannot be instantiated
+public static class LibraryUtilities
+{
+    // Static field - shared across entire application
+    private static int _totalItemsCreated = 0;
+
+    // Static property
+    public static int TotalItemsCreated => _totalItemsCreated;
+
+    // Static constructor - runs once when class is first accessed
+    static LibraryUtilities()
+    {
+        Console.WriteLine("🔧 LibraryUtilities initialized");
+        _totalItemsCreated = 0;
+    }
+
+    // Static methods - no instance needed
+    public static bool IsValidISBN(string isbn)
+    {
+        if (string.IsNullOrWhiteSpace(isbn))
+            return false;
+        var cleanISBN = isbn.Replace("-", "").Replace(" ", "");
+        return cleanISBN.Length == 10 || cleanISBN.Length == 13;
+    }
+
+}
+```
+
+### Using Static Members
+
+```csharp
+// Using static class
+bool isValid = LibraryUtilities.IsValidISBN("978-0134494166");
+```
+
+### When to Use Static Members
+
+- **Utility functions:** Math operations, string formatting, validation
+- **Shared data:** Counters, configuration settings
+- **Factory methods:** Creating instances with specific configurations
+- **Extension methods:** Adding functionality to existing types
+  **Remember:** Static = shared across ALL instances
+
+---
+
+## 4. Sealed Classes and Methods
+
+### What is Sealed?
+
+> **Think of it like this:** Sealed means "final" or "no more changes allowed." It's like putting a lock on something to prevent further modifications.
+
+Think of a completed building:
+
+- **Sealed class:** Building is complete, no more floors can be added
+- **Sealed method:** Specific room design is final, no more modifications
+- **Prevents unwanted changes that could break functionality!**
+
+### Sealed Classes
+
+```csharp
+// Sealed class - cannot be inherited from
+public sealed class FinalizedBook : Book
+{
+    private readonly bool _isSpecialEdition;
+
+    public bool IsSpecialEdition => _isSpecialEdition;
+
+    public FinalizedBook(string title, string author, string isbn, bool isSpecialEdition = false)
+        : base(title, author, isbn)
+    {
+        _isSpecialEdition = isSpecialEdition;
+    }
+
+    // Override with sealed to prevent further overriding
+    public sealed override void DisplayDetailedInfo()
+    {
+        base.DisplayDetailedInfo();
+        Console.WriteLine($"Special Edition: {(IsSpecialEdition ? "Yes" : "No")}");
+        Console.WriteLine("⚠️ This is a finalized book - cannot be inherited");
+    }
+}
+
+// ❌ This won't compile - FinalizedBook is sealed
+// public class SuperFinalBook : FinalizedBook { }
+```
+
+### Sealed Methods
+
+```csharp
+public class BaseVehicle
+{
+    public virtual void Start()
+    {
+        Console.WriteLine("🚗 Vehicle starting...");
+    }
+
+    public virtual void Stop()
+    {
+        Console.WriteLine("🛑 Vehicle stopping...");
+    }
+}
+
+public class Car : BaseVehicle
+{
+    // Sealed override - no further overriding allowed
+    public sealed override void Start()
+    {
+        Console.WriteLine("🚗 Car engine starting...");
+    }
+
+    // Regular override - can be overridden further
+    public override void Stop()
+    {
+        Console.WriteLine("🛑 Car stopping...");
+    }
+}
+
+public class SportsCar : Car
+{
+    // ❌ This won't compile - Start() is sealed in Car
+    // public override void Start() { }
+    // ✅ This works - Stop() is not sealed
+    public override void Stop()
+    {
+        Console.WriteLine("🏎️ Sports car stopping with advanced brakes...");
+    }
+}
+```
+
+### When to Use Sealed
+
+- **Security:** Prevent inheritance that could compromise security
+- **Performance:** Allow compiler optimizations
+- **Design intent:** Signal that class is complete and shouldn't be extended
+- **Framework development:** Prevent users from breaking your API
+
+---
+
+## 5. Partial Classes - Split Implementation
+
+### What are Partial Classes?
+
+> **Think of it like this:** Partial classes let you split one class definition across multiple files. It's like writing a book with multiple authors - each person writes different chapters, but it's still one book.
+
+Think of a large software project:
+
+- **Designer file:** Generated code (like UI layout)
+- **Code-behind file:** Your custom logic
+- **Same class, different files, combined at compile time!**
+
+### Basic Partial Class Example
+
+```csharp
+// File 1: ComplexLibrarySystem_Core.cs
+public partial class ComplexLibrarySystem
+{
+    // Fields and basic properties
+    private string _systemName;
+    private List<Book> _books;
+    private List<User> _users;
+
+    public string SystemName => _systemName;
+
+    // Constructor
+    public ComplexLibrarySystem(string systemName)
+    {
+        _systemName = systemName;
+        _books = new List<Book>();
+        _users = new List<User>();
+        Console.WriteLine($" Complex Library System '{systemName}' initialized");
+    }
+
+    // Basic operations
+    public void AddBook(Book book)
+    {
+        _books.Add(book);
+        Console.WriteLine($" Book added: {book.Title}");
+    }
+
+    public void AddUser(User user)
+    {
+        _users.Add(user);
+        Console.WriteLine($" User added: {user.Name}");
+    }
+}
+```
+
+```csharp
+// File 2: ComplexLibrarySystem_Advanced.cs
+public partial class ComplexLibrarySystem
+{
+    // Advanced search operations
+    public List<Book> SearchBooks(string searchTerm)
+    {
+        Console.WriteLine($"🔍 Searching for: '{searchTerm}'");
+        return _books.Where(book => book.Title.Contains(searchTerm,
+                                  StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+    // Advanced reporting
+    public void GenerateDetailedReport()
+    {
+        Console.WriteLine($"\n Detailed Report for {_systemName}");
+        Console.WriteLine($"════════════════════════════════");
+        Console.WriteLine($"Total Books: {_books.Count}");
+        Console.WriteLine($"Available Books: {_books.Count(b => b.IsAvailable)}");
+        Console.WriteLine($"Total Users: {_users.Count}");
+        Console.WriteLine("════════════════════════════════");
+    }
+}
+```
+
+### Common Use Cases
+
+#### 1. Team Development
+
+```csharp
+// Team Member 1 - Data Layer
+public partial class CustomerManager
+{
+    private List<Customer> _customers;
+
+    public void AddCustomer(Customer customer) { /* implementation */ }
+    public void RemoveCustomer(int id) { /* implementation */ }
+    public Customer GetCustomer(int id) { /* implementation */ }
+}
+
+// Team Member 2 - Business Logic
+public partial class CustomerManager
+{
+    public bool ValidateCustomer(Customer customer) { /* implementation */ }
+    public void SendWelcomeEmail(Customer customer) { /* implementation */ }
+    public List<Customer> GetPremiumCustomers() { /* implementation */ }
+}
+
+// Team Member 3 - Reporting
+public partial class CustomerManager
+{
+    public void GenerateCustomerReport() { /* implementation */ }
+    public void ExportToCSV(string filename) { /* implementation */ }
+    public CustomerStatistics GetStatistics() { /* implementation */ }
+}
+```
+
+### When to Use Partial Classes
+
+- **Generated code:** When tools generate part of your class
+- **Large classes:** Split complex classes into logical files
+- **Team development:** Different team members work on different parts
+- **Separation of concerns:** Separate data, business logic, and UI
+
+### Partial Class Rules
+
+- **Same assembly:** All parts must be in the same project
+- **Same namespace:** All parts must be in the same namespace
+- **Consistent modifiers:** Access modifiers must be consistent
+- **No conflicts:** Can't have conflicting members
+
+---
+
+## 6. Nested Classes - Classes Within Classes
+
+### What are Nested Classes?
+
+> **Think of it like this:** Nested classes are classes defined inside other classes. It's like having a room inside a room - the inner room belongs to and has access to the outer room.
+
+Think of a house with a built-in office:
+
+- **Outer class:** The house (main functionality)
+- **Inner class:** The office (specialized functionality that belongs to the house)
+- **The office has access to everything in the house!**
+
+### Basic Nested Class
+
+```csharp
+public class AdvancedLibrary
+{
+    private string _name;
+    private List<Book> _books;
+    private LibraryStatistics _statistics; // Nested class instance
+
+    public string Name => _name;
+
+    public AdvancedLibrary(string name)
+    {
+        _name = name;
+        _books = new List<Book>();
+        _statistics = new LibraryStatistics(this); // Pass reference to outer class
+    }
+
+    public void AddBook(Book book)
+    {
+        _books.Add(book);
+        _statistics.UpdateBookCount(); // Using nested class
+    }
+
+    public void DisplayStatistics()
+    {
+        _statistics.Display();
+    }
+
+    // Nested class - has access to private members of AdvancedLibrary
+    public class LibraryStatistics
+    {
+        private readonly AdvancedLibrary _parentLibrary;
+        private int _totalBooksAdded;
+        private DateTime _lastUpdated;
+
+        // Constructor takes reference to outer class
+        public LibraryStatistics(AdvancedLibrary parentLibrary)
+        {
+            _parentLibrary = parentLibrary;
+            _totalBooksAdded = 0;
+            _lastUpdated = DateTime.Now;
+        }
+
+        public void UpdateBookCount()
+        {
+            _totalBooksAdded++;
+            _lastUpdated = DateTime.Now;
+            Console.WriteLine($" Statistics updated: {_totalBooksAdded} books added");
+        }
+
+        public void Display()
+        {
+            Console.WriteLine($"\n Statistics for {_parentLibrary._name}"); // Accessing private field!
+            Console.WriteLine($"════════════════════════════════");
+            Console.WriteLine($"Total Books Added: {_totalBooksAdded}");
+            Console.WriteLine($"Current Book Count: {_parentLibrary._books.Count}"); // Accessing private field!
+            Console.WriteLine($"Last Updated: {_lastUpdated:yyyy-MM-dd HH:mm:ss}");
+        }
+    }
+
+    // Static nested class - doesn't need instance of outer class
+    public static class LibraryConstants
+    {
+        public const int MAX_BORROW_DAYS_BOOK = 21;
+        public const int MAX_BORROW_DAYS_DVD = 7;
+        public const decimal LATE_FEE_PER_DAY = 0.50m;
+
+        public static void DisplayConstants()
+        {
+            Console.WriteLine(" Library Constants:");
+            Console.WriteLine($"   Max Borrow Days (Book): {MAX_BORROW_DAYS_BOOK}");
+            Console.WriteLine($"   Max Borrow Days (DVD): {MAX_BORROW_DAYS_DVD}");
+            Console.WriteLine($"   Late Fee Per Day: ${LATE_FEE_PER_DAY}");
+        }
+    }
+}
+```
+
+### Using Nested Classes
+
+```csharp
+// Using the nested class
+AdvancedLibrary library = new AdvancedLibrary("Tech Library");
+
+// Add books (automatically updates statistics)
+library.AddBook(new Book("C# Guide", "Author", "123"));
+library.AddBook(new Book("Design Patterns", "Gang of Four", "456"));
+
+// Display statistics (uses nested class)
+library.DisplayStatistics();
+
+// Using static nested class (no instance needed)
+AdvancedLibrary.LibraryConstants.DisplayConstants();
+
+// Creating nested class instance directly (rarely done)
+var library2 = new AdvancedLibrary("Science Library");
+var stats = new AdvancedLibrary.LibraryStatistics(library2);
+```
+
+### Types of Nested Classes
+
+#### 1. Instance Nested Class
+
+```csharp
+public class OuterClass
+{
+    private int _outerData = 42;
+
+    public class InnerClass
+    {
+        private OuterClass _parent;
+
+        public InnerClass(OuterClass parent)
+        {
+            _parent = parent;
+        }
+
+        public void AccessOuterData()
+        {
+            Console.WriteLine($"Outer data: {_parent._outerData}"); // Can access private members
+        }
+    }
+}
+```
+
+#### 2. Static Nested Class
+
+```csharp
+public class OuterClass
+{
+    private static int _staticData = 100;
+    private int _instanceData = 200;
+
+    public static class StaticInnerClass
+    {
+        public static void DoSomething()
+        {
+            Console.WriteLine($"Static data: {_staticData}"); // ✅ Can access static members
+            // Console.WriteLine($"Instance data: {_instanceData}"); // ❌ Cannot access instance members
+        }
+    }
+}
+```
+
+#### 3. Private Nested Class
+
+```csharp
+public class DataProcessor
+{
+    private List<DataItem> _items;
+
+    public void ProcessData()
+    {
+        var processor = new InternalProcessor();
+        processor.Process(_items);
+    }
+
+    // Private nested class - only DataProcessor can use it
+    private class InternalProcessor
+    {
+        public void Process(List<DataItem> items)
+        {
+            // Internal processing logic
+            foreach (var item in items)
+            {
+                item.Process();
+            }
+        }
+    }
+}
+```
+
+### When to Use Nested Classes
+
+- **Helper classes:** Classes that only make sense within another class
+- **Implementation details:** Hide complex internal logic
+- **Logical grouping:** Keep related classes together
+- **Encapsulation:** Provide access to private members when needed
+
+### Nested Class Guidelines
+
+- **Keep simple:** Don't nest too deeply (max 2-3 levels)
+- **Logical relationship:** Only nest if there's a clear relationship
+- **Consider alternatives:** Sometimes composition is better than nesting
+- **Access control:** Use appropriate access modifiers
+
+---
+
+## 7. Structs - Value Types vs Reference Types
+
+### What are Structs?
+
+> **Think of it like this:** Structs are like simple data containers that are copied completely when you assign them. Classes are like addresses - when you copy an address, both copies point to the same house.
+
+#### Real-World Analogy
+
+Think of photocopying vs sharing:
+
+- **Struct (Value Type):** Making a photocopy - each person has their own complete copy
+- **Class (Reference Type):** Sharing a document - everyone points to the same original
+
+### Basic Struct Example
+
+```csharp
+public struct LibraryLocation
+{
+    // Properties in structs (immutable recommended)
+    public string Building { get; }
+    public int Floor { get; }
+    public string Section { get; }
+    public int ShelfNumber { get; }
+
+    // Constructor (required for structs with properties)
+    public LibraryLocation(string building, int floor, string section, int shelfNumber)
+    {
+        Building = building ?? throw new ArgumentNullException(nameof(building));
+        Floor = floor;
+        Section = section ?? throw new ArgumentNullException(nameof(section));
+        ShelfNumber = shelfNumber;
+    }
+
+    // Method in struct
+    public string GetFullLocation()
+    {
+        return $"{Building}, Floor {Floor}, Section {Section}, Shelf {ShelfNumber}";
+    }
+
+    // Override ToString
+    public override string ToString()
+    {
+        return GetFullLocation();
+    }
+
+    // Structs can implement interfaces
+    public bool Equals(LibraryLocation other)
+    {
+        return Building == other.Building &&
+               Floor == other.Floor &&
+               Section == other.Section &&
+               ShelfNumber == other.ShelfNumber;
+    }
+
+    // Override Equals and GetHashCode
+    public override bool Equals(object? obj)
+    {
+        return obj is LibraryLocation other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Building, Floor, Section, ShelfNumber);
+    }
+
+    // Operator overloading in structs
+    public static bool operator ==(LibraryLocation left, LibraryLocation right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(LibraryLocation left, LibraryLocation right)
+    {
+        return !left.Equals(right);
+    }
+}
+```
+
+### Struct vs Class Comparison
+
+| Aspect                  | Struct (Value Type)                     | Class (Reference Type)        |
+| ----------------------- | --------------------------------------- | ----------------------------- |
+| **Memory**              | Stack (faster)                          | Heap (slower)                 |
+| **Assignment**          | Copies entire value                     | Copies reference              |
+| **Equality**            | Value equality by default               | Reference equality by default |
+| **Inheritance**         | Cannot inherit from classes             | Can inherit                   |
+| **Null values**         | Cannot be null                          | Can be null                   |
+| **Performance**         | Faster for small data                   | Better for large data         |
+| **Default constructor** | Cannot define parameterless constructor | Can define any constructor    |
+
+### When to Use Structs
+
+```csharp
+// ✅ GOOD uses for structs
+public struct Point { public int X; public int Y; }           // Small, simple data
+public struct Color { public byte R, G, B, A; }              // Immutable values
+public struct Money { public decimal Amount; public string Currency; } // Value concepts
+public struct Coordinate { public double Latitude; public double Longitude; } // Mathematical
+
+// ❌ BAD uses for structs
+public struct LargeData { public int[] Array; /* 1000 elements */ } // Too large
+public struct MutableCounter { public int Count; public void Increment() => Count++; } // Mutable
+public class PersonStruct { /* Complex behavior */ } // Should be class
+```
+
+### Struct Best Practices
+
+- **Keep small:** Recommended < 16 bytes
+- **Make immutable:** Properties should be read-only
+- **Override Equals and GetHashCode:** For proper equality comparisons
+- **Implement operators:** == and != for intuitive comparisons
+- **Use for simple data:** Coordinates, colors, small data containers
+
+---
+
+## 8. Destructors
+
+### What are Destructors?
+
+> **Think of it like this:** Destructors are like cleanup crews that run when an object is being removed from memory. They ensure resources are properly cleaned up before the object disappears.
+
+Think of checking out of a hotel:
+
+- **Destructor:** The cleanup process (turning off lights, closing windows)
+- **IDisposable:** Checking out early (you control when cleanup happens)
+- **Garbage Collection:** Hotel management eventually cleans abandoned rooms
+
+### The IDisposable Pattern
+
+```csharp
+public class ResourceHeavyLibraryItem : LibraryItem, IDisposable
+{
+    private bool _disposed = false;
+    private FileStream? _logFile;
+    private IntPtr _unmanagedResource; // Simulated unmanaged resource
+
+    public ResourceHeavyLibraryItem(string title, string itemId)
+        : base(title, itemId)
+    {
+        // Simulate acquiring resources
+        _logFile = new FileStream($"{itemId}.log", FileMode.Create);
+        _unmanagedResource = new IntPtr(12345); // Simulated
+        Console.WriteLine($"🔧 Acquired resources for {title}");
+    }
+
+    // Abstract implementations
+    public override string ItemType => "Resource Heavy Item";
+    public override decimal ReplacementCost => 100.00m;
+
+    public override void DisplayDetailedInfo()
+    {
+        Console.WriteLine($"Resource Heavy Item: {Title}");
+        Console.WriteLine($"Disposed: {_disposed}");
+        Console.WriteLine($"Log file open: {_logFile != null}");
+    }
+
+    // IDisposable implementation
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this); // Tell GC not to call finalizer
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Dispose managed resources
+                Console.WriteLine($"🧹 Disposing managed resources for {Title}");
+                _logFile?.Dispose();
+                _logFile = null;
+            }
+
+            // Dispose unmanaged resources
+            if (_unmanagedResource != IntPtr.Zero)
+            {
+                Console.WriteLine($"🗑️ Releasing unmanaged resources for {Title}");
+                // In real code: CloseHandle(_unmanagedResource);
+                _unmanagedResource = IntPtr.Zero;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    // Destructor/Finalizer - called by garbage collector
+    ~ResourceHeavyLibraryItem()
+    {
+        Console.WriteLine($"💀 Finalizer called for {Title}");
+        Dispose(false);
+    }
+
+    // Helper method to check if disposed
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(nameof(ResourceHeavyLibraryItem));
+    }
+
+    // Methods should check if disposed
+    public void WriteToLog(string message)
+    {
+        ThrowIfDisposed();
+
+        if (_logFile != null)
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes($"{DateTime.Now}: {message}\n");
+            _logFile.Write(bytes, 0, bytes.Length);
+            _logFile.Flush();
+        }
+    }
+}
+```
+
+### Using the `using` Statement
+
+```csharp
+public void ProperResourceManagement()
+{
+    // Method 1: Manual disposal (error-prone)
+    ResourceHeavyLibraryItem item1 = null;
+    try
+    {
+        item1 = new ResourceHeavyLibraryItem("Manual Item", "MANUAL001");
+        item1.WriteToLog("Starting work");
+        // ... do work ...
+    }
+    finally
+    {
+        item1?.Dispose(); // Must remember to dispose!
+    }
+
+    // Method 2: Using statement (automatic disposal)
+    using (ResourceHeavyLibraryItem item2 = new ResourceHeavyLibraryItem("Auto Item", "AUTO001"))
+    {
+        item2.WriteToLog("Starting work");
+        // ... do work ...
+        // Dispose() called automatically when leaving this block
+    }
+
+    // Method 3: Using declaration (C# 8+, even cleaner)
+    using ResourceHeavyLibraryItem item3 = new ResourceHeavyLibraryItem("Declaration Item", "DECL001");
+    item3.WriteToLog("Starting work");
+    // ... do work ...
+    // Dispose() called automatically at end of method
+}
+```
+
+### Garbage Collection and Object Lifecycle
+
+```csharp
+public void DemonstrateGarbageCollection()
+{
+    Console.WriteLine(" Demonstrating Garbage Collection");
+    Console.WriteLine("══════════════════════════════════");
+
+    // Create objects
+    CreateAndAbandonObjects();
+
+    // Force garbage collection (for demonstration only - don't do this in production!)
+    Console.WriteLine(" Forcing garbage collection...");
+    GC.Collect(0); // Collect generation 0
+    GC.WaitForPendingFinalizers();
+
+    Console.WriteLine(" Garbage collection completed");
+}
+
+private void CreateAndAbandonObjects()
+{
+    // Objects created in this method become eligible for GC when method ends
+    var item1 = new ResourceHeavyLibraryItem("Temp Item 1", "TEMP001");
+    var item2 = new ResourceHeavyLibraryItem("Temp Item 2", "TEMP002");
+
+    item1.WriteToLog("Created item 1");
+    item2.WriteToLog("Created item 2");
+
+    // Explicitly dispose one item
+    item1.Dispose();
+
+    // item2 will be finalized by GC (not ideal!)
+    Console.WriteLine(" Leaving method - item2 becomes eligible for GC");
+}
+```
+
+### Memory Management Best Practices
+
+```csharp
+public class LibraryLogger : IDisposable
+{
+    private FileStream? _logFile;
+    private StreamWriter? _writer;
+    private bool _disposed = false;
+
+    public LibraryLogger(string logFilePath)
+    {
+        _logFile = new FileStream(logFilePath, FileMode.Append, FileAccess.Write);
+        _writer = new StreamWriter(_logFile);
+        LogInfo("Logger initialized");
+    }
+
+    public void LogInfo(string message)
+    {
+        if (_disposed) throw new ObjectDisposedException(nameof(LibraryLogger));
+
+        _writer?.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [INFO] {message}");
+        _writer?.Flush(); // Ensure it's written immediately
+    }
+
+    public void LogError(string message, Exception? ex = null)
+    {
+        if (_disposed) throw new ObjectDisposedException(nameof(LibraryLogger));
+
+        _writer?.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [ERROR] {message}");
+        if (ex != null)
+            _writer?.WriteLine($"Exception: {ex.Message}");
+        _writer?.Flush();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Dispose managed resources
+                LogInfo("Logger shutting down");
+                _writer?.Dispose();
+                _logFile?.Dispose();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    ~LibraryLogger()
+    {
+        Dispose(false);
+    }
+}
+```
+
+### Resource Management Best Practices
+
+- **Use `using` statements:** Automatic disposal of resources
+- **Implement IDisposable:** For classes that hold unmanaged resources
+- **Call GC.SuppressFinalize():** In Dispose() to avoid unnecessary finalizer calls
+- **Don't rely on finalizers:** They're not guaranteed to run immediately
+- **Dispose early:** Don't wait for garbage collection
+
+---
+
+## 9. Operator Overloading
+
+### What is Operator Overloading?
+
+> **Think of it like this:** Operator overloading lets you define what operators like `+`, `-`, `==` mean for your custom classes. It's like teaching your class to speak the language of operators.
+
+#### Real-World Analogy
+
+Think of mathematical operations:
+
+- **Built-in:** `5 + 3` works automatically
+- **Custom:** `Money(10) + Money(5)` - you define what "adding money" means
+- **Same operator, different behavior for different types!**
+
+### Money Class Example
+
+```csharp
+public class Money
+{
+    private decimal _amount;
+    private string _currency;
+
+    public decimal Amount => _amount;
+    public string Currency => _currency;
+
+    public Money(decimal amount, string currency = "USD")
+    {
+        _amount = amount;
+        _currency = currency ?? throw new ArgumentNullException(nameof(currency));
+    }
+
+    // Addition operator
+    public static Money operator +(Money left, Money right)
+    {
+        if (left._currency != right._currency)
+            throw new InvalidOperationException($"Cannot add {left._currency} and {right._currency}");
+
+        return new Money(left._amount + right._amount, left._currency);
+    }
+
+    // Subtraction operator
+    public static Money operator -(Money left, Money right)
+    {
+        if (left._currency != right._currency)
+            throw new InvalidOperationException($"Cannot subtract {right._currency} from {left._currency}");
+
+        return new Money(left._amount - right._amount, left._currency);
+    }
+
+    // Multiplication operator (Money * number)
+    public static Money operator *(Money money, decimal multiplier)
+    {
+        return new Money(money._amount * multiplier, money._currency);
+    }
+
+    // Multiplication operator (number * Money)
+    public static Money operator *(decimal multiplier, Money money)
+    {
+        return money * multiplier; // Delegate to the other operator
+    }
+
+    // Division operator
+    public static Money operator /(Money money, decimal divisor)
+    {
+        if (divisor == 0)
+            throw new DivideByZeroException("Cannot divide money by zero");
+
+        return new Money(money._amount / divisor, money._currency);
+    }
+
+    // Comparison operators
+    public static bool operator ==(Money left, Money right)
+    {
+        if (left is null && right is null) return true;
+        if (left is null || right is null) return false;
+
+        return left._amount == right._amount && left._currency == right._currency;
+    }
+
+    public static bool operator !=(Money left, Money right) => !(left == right);
+
+    public static bool operator <(Money left, Money right)
+    {
+        if (left._currency != right._currency)
+            throw new InvalidOperationException($"Cannot compare {left._currency} and {right._currency}");
+
+        return left._amount < right._amount;
+    }
+
+    public static bool operator >(Money left, Money right)
+    {
+        if (left._currency != right._currency)
+            throw new InvalidOperationException($"Cannot compare {left._currency} and {right._currency}");
+
+        return left._amount > right._amount;
+    }
+
+    public static bool operator <=(Money left, Money right) => left == right || left < right;
+    public static bool operator >=(Money left, Money right) => left == right || left > right;
+
+    // Conversion operators
+    public static implicit operator decimal(Money money) => money._amount;
+    public static explicit operator Money(decimal amount) => new Money(amount);
+
+    // Override required methods
+    public override bool Equals(object? obj) => obj is Money other && this == other;
+    public override int GetHashCode() => HashCode.Combine(_amount, _currency);
+    public override string ToString() => $"{_amount:C} {_currency}";
+}
+```
+
+### Using Operator Overloading
+
+```csharp
+public static void DemonstrateOperatorOverloading()
+{
+    Console.WriteLine("🔢 Demonstrating Operator Overloading");
+    Console.WriteLine("═══════════════════════════════════");
+
+    // Book collection operators
+    Book book1 = new Book("Clean Code", "Robert Martin", "978-0132350884");
+    Book book2 = new Book("Design Patterns", "Gang of Four", "978-0201633610");
+    Book book3 = new Book("Refactoring", "Martin Fowler", "978-0134757599");
+
+    BookCollection fiction = new BookCollection();
+    BookCollection technical = new BookCollection();
+
+    // Use + operator to add books
+    fiction = fiction + book1;
+    technical = technical + book2 + book3; // Chaining
+
+    fiction.DisplayCollection("Fiction Collection");
+    technical.DisplayCollection("Technical Collection");
+
+    // Combine collections
+    BookCollection allBooks = fiction + technical;
+    allBooks.DisplayCollection("Combined Collection");
+
+    // Remove book
+    BookCollection withoutCleanCode = allBooks - book1;
+    withoutCleanCode.DisplayCollection("After Removing Clean Code");
+
+    // Test equality
+    BookCollection anotherFiction = new BookCollection();
+    anotherFiction = anotherFiction + book1;
+    Console.WriteLine($"Collections equal? {fiction == anotherFiction}");
+
+    // Money operators
+    Console.WriteLine("\n💰 Money Operator Examples:");
+    Money price1 = new Money(29.99m);
+    Money price2 = new Money(19.99m);
+    Money tax = new Money(2.50m);
+
+    Money total = price1 + price2 + tax;
+    Console.WriteLine($"Total: {total}");
+
+    Money discounted = total * 0.9m; // 10% discount
+    Console.WriteLine($"After 10% discount: {discounted}");
+
+    Money perItem = total / 2;
+    Console.WriteLine($"Price per item: {perItem}");
+
+    // Comparisons
+    Console.WriteLine($"Original total > Discounted? {total > discounted}");
+
+    // Conversions
+    decimal amount = total; // Implicit conversion
+    Money converted = (Money)50.00m; // Explicit conversion
+    Console.WriteLine($"Converted amount: {converted}");
+}
+```
+
+#### Arithmetic Operators
+
+```csharp
+public static Point operator +(Point left, Point right)
+{
+    return new Point(left.X + right.X, left.Y + right.Y);
+}
+
+public static Point operator -(Point left, Point right)
+{
+    return new Point(left.X - right.X, left.Y - right.Y);
+}
+
+public static Point operator *(Point point, double scale)
+{
+    return new Point(point.X * scale, point.Y * scale);
+}
+```
+
+#### Comparison Operators
+
+```csharp
+public static bool operator ==(Version left, Version right)
+{
+    return left?.Major == right?.Major && left?.Minor == right?.Minor;
+}
+
+public static bool operator <(Version left, Version right)
+{
+    if (left.Major != right.Major) return left.Major < right.Major;
+    return left.Minor < right.Minor;
+}
+```
+
+#### Conversion Operators
+
+```csharp
+// Implicit conversion (safe, no data loss)
+public static implicit operator string(ISBN isbn)
+{
+    return isbn.Value;
+}
+
+// Explicit conversion (might lose data or fail)
+public static explicit operator ISBN(string value)
+{
+    if (!IsValidISBN(value))
+        throw new ArgumentException("Invalid ISBN format");
+    return new ISBN(value);
+}
+```
+
+### ✅Operator Overloading Best Practices
+
+- **Keep intuitive:** Operators should behave as users expect
+- **Maintain consistency:** Overload related operators together (`==` and `!=`)
+- **Override Equals() and GetHashCode():** When overloading `==` and `!=`
+- **Handle null values:** Check for null in comparison operators
+- **Consider commutativity:** `a + b` should equal `b + a` when appropriate
+- **Don't abuse:** Only overload when it makes the code more readable
+
+### Operators You Cannot Overload
+
+- **Assignment operators:** `=`, `+=`, `-=` (but compound operators use overloaded `+`, `-`)
+- **Logical operators:** `&&`, `||` (but you can overload `&`, `|`)
+- **Conditional operator:** `?:`
+- **Array indexing:** `[]` (but you can define indexers)
+- **Type operators:** `is`, `as`, `typeof`, `sizeof`
+- **Others:** `::`, `.`, `->`, `()` (method call)
+
+---
